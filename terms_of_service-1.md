@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated:** October 7, 2026
+**Last Updated:** October 31, 2026
 
 ## 1. Acceptance of Terms
 
@@ -21,6 +21,8 @@ Versa is a multi-purpose Discord bot with moderation tools, leveling, a virtual 
 
 - The economy, store and casino use **virtual currency only**. No real money is involved.
 - Virtual currency and items have no real-world value and cannot be bought, sold or exchanged for money.
+- Casino games (blackjack, higher or lower, slots, roulette, coinflip) are for entertainment only. You can never win money or anything of real-world value.
+- Do not buy, sell or trade coins, items or accounts for real money or anything of value, inside or outside Discord. This can lead to a Bot ban and to the economy data being reset.
 - Server administrators or the Bot's developers may reset or adjust economy data at any time, for example to remove cheating.
 
 ## 5. Prohibited Uses
@@ -31,6 +33,7 @@ You may not use the Bot to:
 - try to crash, overload or exploit the Bot or its commands
 - automate interactions in ways that break Discord's terms
 - avoid a ban, a Bot ban or any moderation action
+- trade the Bot's virtual currency or items for real money or anything of value
 
 ## 6. Moderation Features
 

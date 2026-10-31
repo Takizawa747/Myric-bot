@@ -11,6 +11,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+if discord.version_info < (2, 6):
+    sys.exit("discord.py 2.6 or newer is needed. Update it: pip install -U discord.py --break-system-packages")
+
 # ============================================================
 # CONSTANTS
 # ============================================================
@@ -1082,18 +1085,6 @@ async def daily_p(ctx):
     amount = random.randint(200,500); econ["wallet"]+=amount; econ["last_daily"]=now.isoformat(); save_econ()
     await ctx.send(embed=discord.Embed(description=t(gid,"daily_claimed",f"{amount:,}",f"{econ['wallet']:,}"),color=0x57F287))
 
-@bot.command(name="work")
-@feature_required("economy")
-async def work_p(ctx):
-    gid = ctx.guild.id; econ = get_econ(gid, ctx.author.id)
-    jobs = ["programmer","chef","teacher","driver","doctor","mechanic","designer","streamer","lawyer","engineer"]
-    now = datetime.now(timezone.utc); last = econ.get("last_work")
-    if last and (now - datetime.fromisoformat(last)).total_seconds() < 3600:
-        remaining = 3600 - (now - datetime.fromisoformat(last)).total_seconds()
-        await ctx.send(embed=discord.Embed(description=t(gid,"work_wait",f"{int(remaining//60)}m"),color=0xED4245),delete_after=10); return
-    job = random.choice(jobs); amount = random.randint(50,200)
-    econ["wallet"]+=amount; econ["last_work"]=now.isoformat(); save_econ()
-    await ctx.send(embed=discord.Embed(description=t(gid,"work_done",job,f"{amount:,}",f"{econ['wallet']:,}"),color=0x57F287))
 
 
 
@@ -1863,6 +1854,79 @@ def L(text, *args):
     return out
 
 _PHRASE_TABLE = r'''
+{} players ||| {} oyuncu ||| игроков: {}
+## 🎒 {}'s Inventory ||| ## 🎒 {} - Envanter ||| ## 🎒 Инвентарь: {}
+## 🛒 {} Store ||| ## 🛒 {} Market ||| ## 🛒 Магазин {}
+Banned by ID - this account was not in the server. ||| ID ile yasaklandı - bu hesap sunucuda değildi. ||| Забанен по ID - этого аккаунта не было на сервере.
+Bet per player: ${:,} ||| Oyuncu başı bahis: ${:,} ||| Ставка с игрока: ${:,}
+Blackjack! ||| Blackjack! ||| Блэкджек!
+Bust ||| Battın ||| Перебор
+Buy ||| Satın al ||| Купить
+CASHED OUT ||| PARA ALINDI ||| ЗАБРАНО
+Card ||| Kart ||| Карта
+Cash out ${:,} ||| Parayı al ${:,} ||| Забрать ${:,}
+Cash out ||| Parayı al ||| Забрать
+Correct guesses: {} ||| Doğru tahmin: {} ||| Верных ответов: {}
+Dealer ||| Krupiye ||| Дилер
+Dealer: **{}** ||| Krupiye: **{}** ||| Дилер: **{}**
+Flipping... **{}** for **${:,}** ||| Atılıyor... **{}**, **${:,}** ||| Подбрасываем... **{}** на **${:,}**
+Higher ||| Büyük ||| Больше
+Lower ||| Küçük ||| Меньше
+Higher or Lower ||| Büyük mü Küçük mü ||| Больше или меньше
+Higher: **{}** chance · Lower: **{}** chance ||| Büyük: **{}** şans · Küçük: **{}** şans ||| Больше: шанс **{}** · Меньше: шанс **{}**
+LOST ||| KAYBETTİN ||| ПРОИГРЫШ
+MAX WIN ||| MAKSİMUM ||| МАКСИМУМ
+Open {}inv and press Use to use it. ||| Kullanmak için {}inv aç ve Kullan butonuna bas. ||| Открой {}inv и нажми «Использовать».
+Players take turns - only the player whose turn it is can press the buttons. ||| Oyuncular sırayla oynar - butonlara yalnızca sırası gelen basabilir. ||| Игроки ходят по очереди - кнопки нажимает только тот, чей ход.
+Press **Buy** under an item. Your items are in `{}inv`. ||| Bir eşyanın altındaki **Satın al** butonuna bas. Eşyaların `{}inv` içinde. ||| Нажми **Купить** под предметом. Твои предметы - в `{}inv`.
+Push ||| Berabere ||| Ничья
+Spinning... bet **${:,}** ||| Dönüyor... bahis **${:,}** ||| Крутим... ставка **${:,}**
+Hit ||| Kart çek ||| Ещё
+Stand ||| Dur ||| Хватит
+Double ||| İkiye katla ||| Удвоить
+Accept ||| Kabul et ||| Принять
+Decline ||| Reddet ||| Отказаться
+Start now ||| Şimdi başlat ||| Начать сейчас
+Usage: `{}` ||| Kullanım: `{}` ||| Использование: `{}`
+Use ||| Kullan ||| Использовать
+Waiting ||| Bekliyor ||| Ждёт
+Will the next card be higher or lower? A tie loses. ||| Sonraki kart büyük mü küçük mü? Eşitlik kaybettirir. ||| Следующая карта больше или меньше? Ничья - проигрыш.
+Win ||| Kazanç ||| Выигрыш
+{} invites you to blackjack. Bet: **${:,}** each.\nPress **Accept** within {} seconds. ||| {} seni blackjack oynamaya çağırıyor. Bahis: kişi başı **${:,}**.\n{} saniye içinde **Kabul et** butonuna bas. ||| {} зовёт тебя в блэкджек. Ставка: **${:,}** с каждого.\nНажми **Принять** в течение {} секунд.
+⏰ Time is up - auto cash out: **${:,}**. ||| ⏰ Süre doldu - para otomatik alındı: **${:,}**. ||| ⏰ Время вышло - выигрыш забран автоматически: **${:,}**.
+⏳ It is not your turn! ||| ⏳ Sıra sende değil! ||| ⏳ Сейчас не твой ход!
+✅ **{}** - correct! Cash out or keep going. ||| ✅ **{}** - doğru! Paranı al ya da devam et. ||| ✅ **{}** - верно! Забери выигрыш или играй дальше.
+✅ **{}** wins **+${:,}** ||| ✅ **{}** kazandı **+${:,}** ||| ✅ **{}** выигрывает **+${:,}**
+✅ Used **{}** - you got {}! ||| ✅ **{}** kullanıldı - {} rolünü aldın! ||| ✅ **{}** использован - ты получил {}!
+✅ Used **{}**. ||| ✅ **{}** kullanıldı. ||| ✅ **{}** использован.
+✅ You bought **{}** for **${:,}**. Wallet: **${:,}** ||| ✅ **{}** satın alındı: **${:,}**. Cüzdan: **${:,}** ||| ✅ Ты купил **{}** за **${:,}**. Кошелёк: **${:,}**
+❌ **{}** busted: **-${:,}** ||| ❌ **{}** battı: **-${:,}** ||| ❌ **{}** - перебор: **-${:,}**
+❌ **{}** is already banned here. ||| ❌ **{}** bu sunucuda zaten yasaklı. ||| ❌ **{}** уже забанен здесь.
+❌ **{}** loses **-${:,}** ||| ❌ **{}** kaybetti **-${:,}** ||| ❌ **{}** проигрывает **-${:,}**
+❌ **{}** was wrong - the card was {}. You lost **${:,}**. ||| ❌ **{}** yanlış - kart {} çıktı. **${:,}** kaybettin. ||| ❌ **{}** - мимо, выпала карта {}. Ты проиграл **${:,}**.
+❌ Already in a card game: {} ||| ❌ Zaten bir kart oyununda: {} ||| ❌ Уже в карточной игре: {}
+❌ No Discord account has the ID `{}`. ||| ❌ `{}` ID'li bir Discord hesabı yok. ||| ❌ Нет аккаунта Discord с ID `{}`.
+❌ Only {} can do this. ||| ❌ Bunu yalnızca {} yapabilir. ||| ❌ Это может сделать только {}.
+❌ This invitation is not for you. ||| ❌ Bu davet senin için değil. ||| ❌ Это приглашение не для тебя.
+❌ This is not your inventory! ||| ❌ Bu senin envanterin değil! ||| ❌ Это не твой инвентарь!
+❌ This item is no longer in the store. ||| ❌ Bu eşya artık markette yok. ||| ❌ Этого предмета больше нет в магазине.
+❌ You already answered. ||| ❌ Zaten cevap verdin. ||| ❌ Ты уже ответил.
+❌ You already have a card game running! ||| ❌ Zaten devam eden bir kart oyunun var! ||| ❌ У тебя уже идёт карточная игра!
+❌ You can invite up to {} members (no bots). ||| ❌ En fazla {} üye davet edebilirsin (bot olmaz). ||| ❌ Можно пригласить до {} участников (без ботов).
+🃏 Blackjack table ||| 🃏 Blackjack masası ||| 🃏 Стол блэкджека
+🃏 Higher or Lower ||| 🃏 Büyük mü Küçük mü ||| 🃏 Больше или меньше
+🃏 Nobody accepted - the table is closed and the bet was returned. ||| 🃏 Kimse kabul etmedi - masa kapandı ve bahis iade edildi. ||| 🃏 Никто не принял - стол закрыт, ставка возвращена.
+🃏 The table was cancelled and the bet was returned. ||| 🃏 Masa iptal edildi ve bahis iade edildi. ||| 🃏 Стол отменён, ставка возвращена.
+🎉 **{}** - Blackjack! **+${:,}** ||| 🎉 **{}** - Blackjack! **+${:,}** ||| 🎉 **{}** - блэкджек! **+${:,}**
+🎭 Role: {} ||| 🎭 Rol: {} ||| 🎭 Роль: {}
+🎰 Slots ||| 🎰 Slot ||| 🎰 Слоты
+🏆 Maximum reached - auto cash out: **+${:,}** ||| 🏆 Maksimuma ulaştın - para otomatik alındı: **+${:,}** ||| 🏆 Достигнут максимум - выигрыш забран: **+${:,}**
+👉 **{}** is playing ({}s) ||| 👉 Sıra **{}** oyuncusunda ({} sn) ||| 👉 Ходит **{}** ({} с)
+💰 **${:,}** ||| 💰 **${:,}** ||| 💰 **${:,}**
+💰 Cashed out **${:,}** (×{:,.2f}). ||| 💰 **${:,}** alındı (×{:,.2f}). ||| 💰 Забрано **${:,}** (×{:,.2f}).
+💵 **+${:,}** · Wallet: **${:,}** ||| 💵 **+${:,}** · Cüzdan: **${:,}** ||| 💵 **+${:,}** · Кошелёк: **${:,}**
+🤝 **{}** - push, bet returned ||| 🤝 **{}** - berabere, bahis iade ||| 🤝 **{}** - ничья, ставка возвращена
+🪙 Coinflip ||| 🪙 Yazı Tura ||| 🪙 Монетка
 \nℹ️ The store is still switched off. Enable it with /setup feature. ||| \nℹ️ Market hâlâ kapalı. /setup feature ile aç. ||| \nℹ️ Магазин всё ещё отключён. Включи его через /setup feature.
 \n🎭 Role: {} ||| \n🎭 Rol: {} ||| \n🎭 Роль: {}
 **Prefix:** `{}`\nSupport: {}\n\nPick a category below. ||| **Önek:** `{}`\nDestek: {}\n\nAşağıdan bir kategori seç. ||| **Префикс:** `{}`\nПоддержка: {}\n\nВыбери категорию ниже.
@@ -1928,7 +1992,6 @@ This channel has been locked by a moderator.\n**No one can write here.** ||| Bu 
 Title ||| Başlık ||| Заголовок
 Use /setup feature to toggle ||| Açıp kapatmak için /setup feature kullan ||| Используй /setup feature для переключения
 Use `{}buy <item name>` to purchase! ||| Satın almak için `{}buy <eşya adı>` yaz! ||| Чтобы купить, напиши `{}buy <название предмета>`!
-Use {}useitem {} to use it. ||| Kullanmak için {}useitem {} yaz. ||| Чтобы использовать, напиши {}useitem {}.
 User ||| Kullanıcı ||| Пользователь
 Winners ||| Kazananlar ||| Победители
 XP ||| XP ||| XP
@@ -2158,9 +2221,6 @@ Your hand ({}) ||| Elin ({}) ||| Твоя рука ({})
 {} week(s) ||| {} hafta ||| {} нед.
 🔒 Close Ticket ||| 🔒 Ticketı Kapat ||| 🔒 Закрыть тикет
 🎉 Enter ||| 🎉 Katıl ||| 🎉 Участвовать
-👆 Hit ||| 👆 Kart Çek ||| 👆 Взять
-✋ Stand ||| ✋ Dur ||| ✋ Хватит
-✌️ Double ||| ✌️ İkiye Katla ||| ✌️ Удвоить
 📋 Log ||| 📋 Log ||| 📋 Лог
 🎫 Ticket ||| 🎫 Ticket ||| 🎫 Тикеты
 👋 Welcome ||| 👋 Karşılama ||| 👋 Приветствие
@@ -2403,7 +2463,7 @@ def _clean_name(text):
 
 GENERAL_CMDS = {"balance", "daily", "work", "deposit", "withdraw", "rob", "pay", "elb", "blackjack", "slots",
                 "coinflip", "rank", "leaderboard", "flag", "flag-leaderboard", "afk", "estore", "buy", "inv",
-                "useitem", "giveitem"}
+                "giveitem", "higherlower"}
 
 _DANGEROUS_PERMS = ("administrator", "manage_guild", "manage_roles", "manage_channels", "manage_messages",
                     "manage_nicknames", "kick_members", "ban_members", "moderate_members", "view_audit_log",
@@ -2943,95 +3003,10 @@ def store_embed(guild):
     embed.set_footer(text=L('{} item(s) available', len(items)))
     return embed
 
-@bot.command(name="estore", aliases=["store", "shop"])
-@feature_required("estore")
-async def estore_p(ctx):
-    embed = store_embed(ctx.guild)
-    if embed is None:
-        await ctx.send(embed=discord.Embed(description=L('🛒 The store is empty!'), color=0xff6b35))
-        return
-    await ctx.send(embed=embed)
 
-@bot.tree.command(name="estore", description="Show the economy store")
-@app_commands.guild_only()
-async def estore_s(interaction: discord.Interaction):
-    if not await slash_check_feature(interaction, "estore"):
-        return
-    embed = store_embed(interaction.guild)
-    if embed is None:
-        await interaction.response.send_message(embed=discord.Embed(description=L('🛒 The store is empty!'), color=0xff6b35))
-        return
-    await interaction.response.send_message(embed=embed)
 
-@bot.command(name="buy")
-@feature_required("estore")
-async def buy_p(ctx, *, item_name: str = None):
-    name = _clean_name(item_name)
-    if not name:
-        await ctx.send(L('❌ Usage: `{}`', '.buy <item name>'), delete_after=5)
-        return
-    items = estore_db.get(str(ctx.guild.id), {})
-    item = next((it for it in items.values() if it["name"].lower() == name.lower()), None)
-    if not item:
-        await ctx.send(L('❌ Item `{}` was not found! Use the store command to see all items.', name), delete_after=8)
-        return
-    econ = get_econ(ctx.guild.id, ctx.author.id)
-    if econ["wallet"] < item["price"]:
-        await ctx.send(embed=discord.Embed(description=L('❌ You need **${:,}** but only have **${:,}**!', item['price'], econ['wallet']), color=0xED4245))
-        return
-    econ["wallet"] -= item["price"]
-    econ["inventory"].append(item["name"])          # the role is only given when the item is USED
-    save_econ()
-    pfx = get_settings(ctx.guild.id).get("prefix", ".")
-    embed = discord.Embed(title=L('✅ Purchase Successful!'), color=0x57F287)
-    embed.add_field(name=L('Item'), value=item["name"], inline=True)
-    embed.add_field(name=L('Price'), value=f"${item['price']:,}", inline=True)
-    embed.add_field(name=L('Remaining'), value=f"${econ['wallet']:,}", inline=True)
-    embed.set_footer(text=L('Use {}useitem {} to use it.', pfx, item['name']))
-    await ctx.send(embed=embed)
 
-@bot.command(name="inv", aliases=["inventory"])
-@feature_required("estore")
-async def inv_p(ctx, member: discord.Member = None):
-    target = member or ctx.author
-    inventory = get_econ(ctx.guild.id, target.id).get("inventory", [])
-    embed = discord.Embed(title=L("🎒 {}'s Inventory", target.display_name), color=0xff6b35)
-    if not inventory:
-        embed.description = L("*No items yet!*")
-    else:
-        embed.description = "\n".join(f"• **{name}** x{n}" for name, n in collections.Counter(inventory).items())
-    embed.set_thumbnail(url=target.display_avatar.url)
-    await ctx.send(embed=embed)
 
-@bot.command(name="useitem")
-@feature_required("estore")
-async def useitem_p(ctx, *, item_name: str = None):
-    name = _clean_name(item_name)
-    if not name:
-        await ctx.send(L('❌ Usage: `{}`', '.useitem <item name>'), delete_after=5)
-        return
-    inventory = get_econ(ctx.guild.id, ctx.author.id)["inventory"]
-    found = next((i for i in inventory if i.lower() == name.lower()), None)
-    if not found:
-        await ctx.send(L("❌ You don't have `{}`! Check your inventory.", name), delete_after=8)
-        return
-    data = next((it for it in estore_db.get(str(ctx.guild.id), {}).values() if it["name"].lower() == found.lower()), None)
-    role = ctx.guild.get_role(int(data["role"])) if data and data.get("role") else None
-    if role:
-        if not role_assignable(ctx.guild, role):
-            await ctx.send(L("❌ This item's role can no longer be given (permissions or hierarchy changed). Ask an admin."), delete_after=8)
-            return
-        try:
-            await ctx.author.add_roles(role, reason=f"Store item used: {found}")
-        except Exception as e:
-            await ctx.send(f"❌ {e}", delete_after=6)
-            return
-    inventory.remove(found)
-    save_econ()
-    embed = discord.Embed(title=L('✅ Used: {}', found), color=0x57F287)
-    if role:
-        embed.add_field(name=L('Role Given'), value=role.mention)
-    await ctx.send(embed=embed)
 
 @bot.command(name="giveitem")
 @feature_required("estore")
@@ -3051,162 +3026,8 @@ async def giveitem_p(ctx, *, args: str = None):
     save_econ()
     await ctx.send(embed=discord.Embed(description=L('✅ **{}** was given to {}!', found, member.mention), color=0x57F287))
 
-class BlackjackView(BaseView):
-    def __init__(self, user_id, gid):
-        super().__init__(timeout=90)
-        self.user_id = user_id
-        self.gid = gid
-        self.message = None
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if not await super().interaction_check(interaction):
-            return False
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message(L('❌ This is not your game!'), ephemeral=True)
-            return False
-        return True
 
-    def render(self, game, reveal=False, result=None, color=0x1a1a1a):
-        embed = discord.Embed(title=L('🃏 Blackjack'), color=color)
-        embed.add_field(name=L('Your hand ({})', hand_value(game['player'])), value=" ".join(card_emoji(c) for c in game["player"]), inline=False)
-        if reveal:
-            embed.add_field(name=L('Dealer hand ({})', hand_value(game['dealer'])), value=" ".join(card_emoji(c) for c in game["dealer"]), inline=False)
-        else:
-            embed.add_field(name=L('Dealer hand (?)'), value=card_emoji(game["dealer"][0]) + " 🂠", inline=False)
-        if result:
-            embed.add_field(name=L('Result'), value=result, inline=False)
-        embed.set_footer(text=L('Bet: ${:,}', game['bet']))
-        return embed
-
-    async def settle(self, interaction, game):
-        while hand_value(game["dealer"]) < 17:
-            game["dealer"].append(game["deck"].pop())
-        pv, dv, bet = hand_value(game["player"]), hand_value(game["dealer"]), game["bet"]
-        econ = get_econ(self.gid, self.user_id)
-        if pv > 21:
-            result, color = L("❌ Bust! You lost **${:,}**", bet), 0xED4245
-        elif dv > 21 or pv > dv:
-            econ["wallet"] += bet * 2
-            save_econ()
-            result, color = L("✅ You win! **+${:,}**", bet), 0x57F287
-        elif pv == dv:
-            econ["wallet"] += bet
-            save_econ()
-            result, color = L("🤝 Push! Your bet was returned."), 0xFEE75C
-        else:
-            result, color = L("❌ Dealer wins! You lost **${:,}**", bet), 0xED4245
-        active_bj.pop(self.user_id, None)
-        self.stop()
-        await interaction.response.edit_message(embed=self.render(game, reveal=True, result=result, color=color), view=None)
-
-    @discord.ui.button(label="👆 Hit", style=discord.ButtonStyle.green)
-    async def hit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        game = active_bj.get(self.user_id)
-        if not game:
-            await interaction.response.send_message(L('❌ Game not found!'), ephemeral=True)
-            return
-        game["player"].append(game["deck"].pop())
-        if hand_value(game["player"]) > 21:
-            await self.settle(interaction, game)
-            return
-        await interaction.response.edit_message(embed=self.render(game), view=self)
-
-    @discord.ui.button(label="✋ Stand", style=discord.ButtonStyle.red)
-    async def stand(self, interaction: discord.Interaction, button: discord.ui.Button):
-        game = active_bj.get(self.user_id)
-        if not game:
-            await interaction.response.send_message(L('❌ Game not found!'), ephemeral=True)
-            return
-        await self.settle(interaction, game)
-
-    @discord.ui.button(label="✌️ Double", style=discord.ButtonStyle.blurple)
-    async def double(self, interaction: discord.Interaction, button: discord.ui.Button):
-        game = active_bj.get(self.user_id)
-        if not game:
-            await interaction.response.send_message(L('❌ Game not found!'), ephemeral=True)
-            return
-        econ = get_econ(self.gid, self.user_id)
-        if len(game["player"]) != 2 or econ["wallet"] < game["bet"]:
-            await interaction.response.send_message(L('❌ You can only double on your first move and with enough money!'), ephemeral=True)
-            return
-        econ["wallet"] -= game["bet"]
-        game["bet"] *= 2
-        save_econ()
-        game["player"].append(game["deck"].pop())
-        await self.settle(interaction, game)
-
-    async def on_timeout(self):
-        game = active_bj.pop(self.user_id, None)
-        if game and self.message:
-            try:
-                await self.message.edit(embed=discord.Embed(description=L("⏰ The blackjack game timed out and the bet was lost."), color=0x808080), view=None)
-            except Exception:
-                pass
-
-@bot.command(name="blackjack", aliases=["bj"])
-@feature_required("casino")
-async def bj_p(ctx, bet: str = None):
-    gid = ctx.guild.id
-    if not await check_casino(ctx, is_slash=False):
-        return
-    econ = get_econ(gid, ctx.author.id)
-    amount = parse_amount(bet, econ["wallet"])
-    if amount is None or amount <= 0:
-        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
-        return
-    bet = amount
-    if ctx.author.id in active_bj:
-        await ctx.send(L('❌ You already have a blackjack game running!'), delete_after=5)
-        return
-    if bet > econ["wallet"]:
-        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
-        return
-    deck = create_deck()
-    game = {"player": [deck.pop(), deck.pop()], "dealer": [deck.pop(), deck.pop()], "deck": deck, "bet": bet}
-    econ["wallet"] -= bet
-    save_econ()
-    view = BlackjackView(ctx.author.id, gid)
-    if hand_value(game["player"]) == 21:
-        win = int(bet * 2.5)
-        econ["wallet"] += win
-        save_econ()
-        await ctx.send(embed=view.render(game, reveal=True, result=L("🎉 Blackjack! You won **${:,}**!", win - bet), color=0xFFD700))
-        return
-    active_bj[ctx.author.id] = game
-    view.message = await ctx.send(embed=view.render(game), view=view)
-
-@bot.command(name="coinflip", aliases=["cf"])
-@feature_required("casino")
-async def cf_p(ctx, bet: str = None, choice: str = None):
-    gid = ctx.guild.id
-    if not await check_casino(ctx, is_slash=False):
-        return
-    picks = {"heads": "heads", "head": "heads", "h": "heads", "tails": "tails", "tail": "tails", "t": "tails"}
-    if bet and bet.lower() in picks and choice and choice.lower() not in picks:      # "cf heads 30%" works too
-        bet, choice = choice, bet
-    pick = picks.get((choice or "").lower())
-    if bet is None or not pick:
-        await ctx.send(L("❌ Usage: `{}`", ".cf <bet|all|half|25%> heads/tails"), delete_after=6)
-        return
-    econ = get_econ(gid, ctx.author.id)
-    amount = parse_amount(bet, econ["wallet"])
-    if amount is None or amount <= 0:
-        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
-        return
-    bet = amount
-    if bet > econ["wallet"]:
-        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
-        return
-    result = "heads" if _RNG.getrandbits(1) == 0 else "tails"
-    won = result == pick
-    econ["wallet"] += bet if won else -bet
-    save_econ()
-    face = L("Heads") if result == "heads" else L("Tails")
-    if won:
-        desc = L("🪙 **{}**!\n✅ You won **+${:,}**!", face, bet)
-    else:
-        desc = L("🪙 **{}**!\n❌ You lost **-${:,}**!", face, bet)
-    await ctx.send(embed=discord.Embed(description=desc, color=0x57F287 if won else 0xED4245))
 
 
 
@@ -3950,7 +3771,7 @@ _SETUP_LIST = "`/setup` log · ticket · ticketstaff · ticketpanel · tickettit
 HELP_TEXT = {
     "en": {
         "mod": ("🛡️ Moderation",
-                "`{p}ban @user [1d/2h] [reason]` · `{p}unban <id>` · `{p}kick @user` · `{p}softban @user`\n"
+                "`{p}ban @user [1d/2h] [reason]` · `{p}forceban <id> [reason]` (not in the server) · `{p}unban <id>` · `{p}kick @user` · `{p}softban @user`\n"
                 "`{p}mute @user [2h]` · `{p}unmute @user` · `{p}timeout @user 10m` · `{p}untimeout @user`\n"
                 "`{p}warn @user` · `{p}warnings [@user]` · `{p}clearwarns @user`\n"
                 "`{p}history @user` · `{p}case <id>` · `{p}purge <1-100>` · `{p}nick @user [name]`\n"
@@ -3960,11 +3781,11 @@ HELP_TEXT = {
                 "`{p}bal [@user]` — wallet and bank\n`{p}daily` · `{p}work`\n`{p}dep <amount|all|half|25%>` · `{p}with <amount|all|half|25%>`\n"
                 "`{p}rob @user` · `{p}pay @user <amount|all|half|25%>` (10% tax)\n`{p}elb` — richest members"),
         "store": ("🛒 Store",
-                  "`{p}estore` — view the store\n`{p}buy <item>` — buy an item\n`{p}inv [@user]` — inventory\n"
-                  "`{p}useitem <item>` — use it (gives its role)\n`{p}giveitem <item> @user` — give an item\n"
+                  "`{p}estore` — the store, with a **Buy** button under every item\n`{p}buy <item>` — buy by name\n`{p}inv [@user]` — inventory, with a **Use** button under every item (gives its role)\n"
+                  "`{p}giveitem <item> @user` — give an item\n"
                   "Admins: `/setup estore`, `/setup feature`"),
         "casino": ("🎰 Casino",
-                   "`{p}bj <bet>` — Blackjack (buttons)\n`{p}slots <bet>` — Slots\n`{p}cf <bet> heads/tails` — Coinflip\nBets and amounts accept `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
+                   "`{p}bj <bet>` — Blackjack · `{p}bj @user1 @user2 <bet>` — up to 4 players\n`{p}hl <bet>` — Higher or Lower (cash out any time)\n`{p}slots <bet>` — Slots\n`{p}cf <bet> heads/tails` — Coinflip\nBets and amounts accept `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
         "level": ("📊 Leveling",
                   "`{p}rank [@user]` · `{p}lb` — leaderboard\nXP per message (30s cooldown)\nVoice XP: `{p}vcxp` · `/vcxp`\n"
                   "Admins: `/setup leveldiff`, `/setup levelrole`, `/setup levelup`, `/setup vc`, `/setup vcxpdiff`"),
@@ -3984,7 +3805,7 @@ HELP_TEXT = {
     },
     "tr": {
         "mod": ("🛡️ Moderasyon",
-                "`{p}ban @üye [1d/2h] [sebep]` · `{p}unban <id>` · `{p}kick @üye` · `{p}softban @üye`\n"
+                "`{p}ban @üye [1d/2h] [sebep]` · `{p}forceban <id> [sebep]` (sunucuda olmayan) · `{p}unban <id>` · `{p}kick @üye` · `{p}softban @üye`\n"
                 "`{p}mute @üye [2h]` · `{p}unmute @üye` · `{p}timeout @üye 10m` · `{p}untimeout @üye`\n"
                 "`{p}warn @üye` · `{p}warnings [@üye]` · `{p}clearwarns @üye`\n"
                 "`{p}history @üye` · `{p}case <id>` · `{p}purge <1-100>` · `{p}nick @üye [isim]`\n"
@@ -3994,11 +3815,11 @@ HELP_TEXT = {
                 "`{p}bal [@üye]` — cüzdan ve banka\n`{p}daily` · `{p}work`\n`{p}dep <miktar|all|half|25%>` · `{p}with <miktar|all|half|25%>`\n"
                 "`{p}rob @üye` · `{p}pay @üye <miktar|all|half|25%>` (%10 vergi)\n`{p}elb` — en zenginler"),
         "store": ("🛒 Market",
-                  "`{p}estore` — marketi göster\n`{p}buy <eşya>` — eşya satın al\n`{p}inv [@üye]` — envanter\n"
-                  "`{p}useitem <eşya>` — eşyayı kullan (rolünü verir)\n`{p}giveitem <eşya> @üye` — eşya ver\n"
+                  "`{p}estore` — market, her eşyanın altında **Satın al** butonu\n`{p}buy <eşya>` — isimle satın al\n`{p}inv [@üye]` — envanter, her eşyanın altında **Kullan** butonu (rolünü verir)\n"
+                  "`{p}giveitem <eşya> @üye` — eşya ver\n"
                   "Yöneticiler: `/setup estore`, `/setup feature`"),
         "casino": ("🎰 Casino",
-                   "`{p}bj <bahis>` — Blackjack (butonlarla)\n`{p}slots <bahis>` — Slot\n`{p}cf <bahis> heads/tails` — Yazı tura\nMiktar: `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
+                   "`{p}bj <bahis>` — Blackjack · `{p}bj @üye1 @üye2 <bahis>` — 4 kişiye kadar\n`{p}hl <bahis>` — Büyük mü küçük mü (istediğin an parayı al)\n`{p}slots <bahis>` — Slot\n`{p}cf <bahis> heads/tails` — Yazı tura\nMiktar: `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
         "level": ("📊 Seviye",
                   "`{p}rank [@üye]` · `{p}lb` — sıralama\nHer mesajda XP (30 sn bekleme)\nSes XP: `{p}vcxp` · `/vcxp`\n"
                   "Yöneticiler: `/setup leveldiff`, `/setup levelrole`, `/setup levelup`, `/setup vc`, `/setup vcxpdiff`"),
@@ -4018,7 +3839,7 @@ HELP_TEXT = {
     },
     "ru": {
         "mod": ("🛡️ Модерация",
-                "`{p}ban @user [1d/2h] [причина]` · `{p}unban <id>` · `{p}kick @user` · `{p}softban @user`\n"
+                "`{p}ban @user [1d/2h] [причина]` · `{p}forceban <id> [причина]` (не на сервере) · `{p}unban <id>` · `{p}kick @user` · `{p}softban @user`\n"
                 "`{p}mute @user [2h]` · `{p}unmute @user` · `{p}timeout @user 10m` · `{p}untimeout @user`\n"
                 "`{p}warn @user` · `{p}warnings [@user]` · `{p}clearwarns @user`\n"
                 "`{p}history @user` · `{p}case <id>` · `{p}purge <1-100>` · `{p}nick @user [ник]`\n"
@@ -4028,11 +3849,11 @@ HELP_TEXT = {
                 "`{p}bal [@user]` — кошелёк и банк\n`{p}daily` · `{p}work`\n`{p}dep <сумма|all|half|25%>` · `{p}with <сумма|all|half|25%>`\n"
                 "`{p}rob @user` · `{p}pay @user <сумма|all|half|25%>` (налог 10%)\n`{p}elb` — самые богатые"),
         "store": ("🛒 Магазин",
-                  "`{p}estore` — показать магазин\n`{p}buy <предмет>` — купить предмет\n`{p}inv [@user]` — инвентарь\n"
-                  "`{p}useitem <предмет>` — использовать (выдаёт роль)\n`{p}giveitem <предмет> @user` — передать предмет\n"
+                  "`{p}estore` — магазин, кнопка **Купить** под каждым предметом\n`{p}buy <предмет>` — купить по названию\n`{p}inv [@user]` — инвентарь, кнопка **Использовать** под каждым предметом (выдаёт роль)\n"
+                  "`{p}giveitem <предмет> @user` — передать предмет\n"
                   "Админы: `/setup estore`, `/setup feature`"),
         "casino": ("🎰 Казино",
-                   "`{p}bj <ставка>` — Блэкджек (кнопки)\n`{p}slots <ставка>` — Слоты\n`{p}cf <ставка> heads/tails` — Монетка\nСумма: `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
+                   "`{p}bj <ставка>` — Блэкджек · `{p}bj @user1 @user2 <ставка>` — до 4 игроков\n`{p}hl <ставка>` — Больше или меньше (забрать выигрыш можно в любой момент)\n`{p}slots <ставка>` — Слоты\n`{p}cf <ставка> heads/tails` — Монетка\nСумма: `all`, `half`, `quarter`, `25%`, `1.5k`, `2m`, `100,000,000`"),
         "level": ("📊 Уровни",
                   "`{p}rank [@user]` · `{p}lb` — таблица лидеров\nXP за сообщения (пауза 30 сек)\nXP в голосе: `{p}vcxp` · `/vcxp`\n"
                   "Админы: `/setup leveldiff`, `/setup levelrole`, `/setup levelup`, `/setup vc`, `/setup vcxpdiff`"),
@@ -4113,45 +3934,6 @@ def slot_spin():
 def slots_paytable():
     return "\n".join(f"{e}{e}{e} **x{tm:g}**  ·  {e}{e} x{pm:g}" for e, _w, pm, tm in SLOT_SYMBOLS if tm)
 
-@bot.command(name="slots")
-@feature_required("casino")
-async def slots_p(ctx, bet: str = None):
-    gid = ctx.guild.id
-    if not await check_casino(ctx, is_slash=False):
-        return
-    econ = get_econ(gid, ctx.author.id)
-    if bet is None:
-        embed = discord.Embed(title=L("🎰 Slots Paytable"), color=0xffd700,
-                              description=slots_paytable() + "\n\n" + L("Three of a kind pays the big number, two of a kind the small one. 🍀 pays nothing."))
-        embed.set_footer(text=L("Play: .slots <bet> · Wallet: ${:,}", econ["wallet"]))
-        await ctx.send(embed=embed)
-        return
-    amount = parse_amount(bet, econ["wallet"])
-    if amount is None or amount <= 0:
-        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
-        return
-    bet = amount
-    if bet > econ["wallet"]:
-        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
-        return
-    econ["wallet"] -= bet
-    reels, mult, kind = slot_spin()
-    payout = int(bet * mult)
-    econ["wallet"] += payout
-    save_econ()
-    display = " | ".join(reels)
-    sym = next((e for e in reels if reels.count(e) >= 2), "")
-    if kind == "jackpot":
-        desc, color = L("🎰 {}\n\n💥 **JACKPOT!** x{:g} → **${:,}**!", display, mult, payout), 0xffd700
-    elif kind == "triple":
-        desc, color = L("🎰 {}\n\n🎉 **Three {}!** x{:g} → **${:,}**", display, sym, mult, payout), 0x57F287
-    elif kind == "pair" and mult > 1:
-        desc, color = L("🎰 {}\n\n✅ Two {}! x{:g} → **${:,}**", display, sym, mult, payout), 0x57F287
-    elif kind == "pair":
-        desc, color = L("🎰 {}\n\n🤝 Two {}! Your bet is returned.", display, sym), 0xFEE75C
-    else:
-        desc, color = L("🎰 {}\n\n❌ No match. -${:,}", display, bet), 0xED4245
-    await ctx.send(embed=discord.Embed(description=desc, color=color))
 
 # ---------- rob: 30 minute cooldown, a caught robber loses 70% of the wallet ----------
 ROB_COOLDOWN = 1800
@@ -6803,6 +6585,1573 @@ async def on_thread_delete(thread):
     await send_log(g, e)
 
 
+
+# ============================================================
+# VISUAL SUITE - animated slots / coin, moderation banners, rank / level-up / leaderboard cards.
+# Pillow is OPTIONAL: when it is missing (or anything fails) every command falls back to its plain embed.
+# ============================================================
+FX_OK = False
+try:
+    from PIL import Image as PI, ImageDraw as PD, ImageFilter as PFl, ImageFont as PFt
+    FX_OK = True
+except Exception:
+    pass
+
+_FX_SEM = None
+async def fx_run(fn, *args, timeout=8.0):
+    """Run a CPU-heavy renderer in a worker thread (two at a time at most) with a time limit."""
+    global _FX_SEM
+    if not FX_OK:
+        raise RuntimeError("Pillow is not installed")
+    if _FX_SEM is None:
+        _FX_SEM = asyncio.Semaphore(2)
+    async with _FX_SEM:
+        return await asyncio.wait_for(asyncio.to_thread(fn, *args), timeout)
+
+def _fx_lerp(a, b, t): return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(len(a)))
+_FX_FONTS = {}
+def _fx_font(size, bold=True):
+    key = (size, bold)
+    if key not in _FX_FONTS:
+        f, names = None, (("DejaVuSans-Bold.ttf", "LiberationSans-Bold.ttf") if bold else ("DejaVuSans.ttf", "LiberationSans-Regular.ttf"))
+        for d in ("/usr/share/fonts/truetype/dejavu/", "/usr/share/fonts/truetype/liberation/", ""):
+            for n in names:
+                try:
+                    f = PFt.truetype(d + n, size)
+                    break
+                except Exception:
+                    pass
+            if f:
+                break
+        if f is None:
+            try:
+                f = PFt.load_default(size)
+            except TypeError:
+                f = PFt.load_default()
+        _FX_FONTS[key] = f
+    return _FX_FONTS[key]
+
+_FX_TOFU = {}
+def _fx_mask(font, ch):
+    m = font.getmask(ch)
+    return m.tobytes() if hasattr(m, "tobytes") else bytes(m)
+def _fx_safe(font, text, max_w=None):
+    """Names may contain emoji or scripts the font lacks: drop those characters (no empty boxes) and shorten to fit."""
+    ref = _FX_TOFU.setdefault(id(font), _fx_mask(font, "\uFFFE"))
+    out = []
+    for ch in str(text):
+        if ch.isspace():
+            out.append(" ")
+            continue
+        try:
+            ok = _fx_mask(font, ch) != ref
+        except Exception:
+            ok = ch.isascii()
+        if ok and ch.isprintable():
+            out.append(ch)
+    s = " ".join("".join(out).split()) or "?"
+    if max_w and font.getlength(s) > max_w:
+        while len(s) > 1 and font.getlength(s + "…") > max_w:
+            s = s[:-1]
+        s = s.rstrip() + "…"
+    return s
+
+def _fx_gif(frames, dur_ms, last_ms=30000, colors=200):
+    n = len(frames)
+    idx = sorted({round(i * (n - 1) / 7) for i in range(8)})
+    w, h = frames[0].size
+    mosaic = PI.new("RGB", (w // 2 * len(idx), h // 2))
+    for q, i in enumerate(idx):
+        mosaic.paste(frames[i].resize((w // 2, h // 2)), (q * (w // 2), 0))
+    pal = mosaic.quantize(colors=colors, method=PI.Quantize.MEDIANCUT)
+    pf = [f.quantize(palette=pal, dither=PI.Dither.NONE) for f in frames]
+    buf = io.BytesIO()
+    pf[0].save(buf, format="GIF", save_all=True, append_images=pf[1:], duration=[dur_ms] * (n - 1) + [last_ms], loop=0, disposal=1)
+    return buf.getvalue()
+def _fx_png(img):
+    b = io.BytesIO()
+    img.save(b, format="PNG", optimize=True)
+    return b.getvalue()
+
+_FX_AVATARS = {}
+async def fx_avatar(user, size=128):
+    """Avatar bytes (cached); None when it cannot be fetched."""
+    try:
+        key = (user.id, getattr(user.display_avatar, "key", ""), size)
+        if key in _FX_AVATARS:
+            return _FX_AVATARS[key]
+        data = await user.display_avatar.replace(size=size, format="png").read()
+        if len(_FX_AVATARS) > 300:
+            _FX_AVATARS.pop(next(iter(_FX_AVATARS)))
+        _FX_AVATARS[key] = data
+        return data
+    except Exception:
+        return None
+
+class _Cv:
+    """Tiny supersampled drawing canvas: everything is drawn k times larger and shrunk at the end (smooth edges)."""
+    def __init__(self, w, h, k=2, bg=(0, 0, 0)):
+        self.w, self.h, self.k = w, h, k
+        self.im = PI.new("RGB", (w * k, h * k), bg)
+        self.d = PD.Draw(self.im, "RGBA")
+    def box(self, b): return tuple(int(v * self.k) for v in b)
+    def rr(self, b, r, fill=None, outline=None, width=1):
+        self.d.rounded_rectangle(self.box(b), int(r * self.k), fill=fill, outline=outline, width=max(1, int(width * self.k)))
+    def ell(self, b, fill=None, outline=None, width=1):
+        self.d.ellipse(self.box(b), fill=fill, outline=outline, width=max(1, int(width * self.k)))
+    def text(self, xy, s, size, fill, anchor="la", bold=True):
+        self.d.text((xy[0] * self.k, xy[1] * self.k), s, font=_fx_font(int(size * self.k), bold), fill=fill, anchor=anchor)
+    def safe(self, s, size, max_w, bold=True): return _fx_safe(_fx_font(int(size * self.k), bold), s, max_w * self.k)
+    def grad(self, box, c1, c2, vertical=False, radius=0):
+        x0, y0, x1, y1 = self.box(box)
+        w, h = max(1, x1 - x0), max(1, y1 - y0)
+        g = PI.new("RGB", (w, h))
+        gd = PD.Draw(g)
+        for i in range(h if vertical else w):
+            c = _fx_lerp(c1, c2, i / max(1, (h if vertical else w) - 1))
+            gd.line([(0, i), (w, i)] if vertical else [(i, 0), (i, h)], fill=c)
+        mask = PI.new("L", (w, h), 0)
+        PD.Draw(mask).rounded_rectangle((0, 0, w - 1, h - 1), int(radius * self.k), fill=255)
+        self.im.paste(g, (x0, y0), mask)
+    def avatar(self, data, cx, cy, r, name, accent):
+        size = int(2 * r * self.k)
+        av = None
+        if data:
+            try:
+                av = PI.open(io.BytesIO(data)).convert("RGB").resize((size, size), PI.Resampling.LANCZOS)
+            except Exception:
+                av = None
+        if av is None:
+            av = PI.new("RGB", (size, size), accent)
+            ch = self.safe(name, 10, 40)[:1].upper() or "?"
+            PD.Draw(av).text((size / 2, size / 2), ch, font=_fx_font(int(size * 0.5)), fill=(255, 255, 255), anchor="mm")
+        mask = PI.new("L", (size, size), 0)
+        PD.Draw(mask).ellipse((0, 0, size - 1, size - 1), fill=255)
+        self.im.paste(av, (int(cx * self.k - size / 2), int(cy * self.k - size / 2)), mask)
+    def width(self, s, size, bold=True): return _fx_font(int(size * self.k), bold).getlength(s) / self.k
+    def out(self): return self.im.resize((self.w, self.h), PI.Resampling.LANCZOS)
+
+# ---------------- slot machine ----------------
+_SLOT_SYMBOLS = [s[0] for s in SLOT_SYMBOLS]          # same symbols and weights as the real paytable
+_SLOT_WEIGHTS = [s[1] for s in SLOT_SYMBOLS]
+_SLOT_ASSETS = {}
+def _slot_assets():
+    if _SLOT_ASSETS:
+        return _SLOT_ASSETS
+    S, SPR = 4, 84
+    def new(): return PI.new("RGBA", (SPR * S, SPR * S), (0, 0, 0, 0)), SPR * S / 100
+    def fin(im): return im.resize((SPR, SPR), PI.Resampling.LANCZOS)
+    def ball(im, cx, cy, r, light, dark, outline=None, steps=18):
+        d = PD.Draw(im)
+        if outline:
+            d.ellipse((cx - r - 2.2 * S, cy - r - 2.2 * S, cx + r + 2.2 * S, cy + r + 2.2 * S), fill=outline + (255,))
+        for i in range(steps):
+            t = i / (steps - 1)
+            rr, off = r * (1 - 0.8 * t), r * 0.22 * t
+            d.ellipse((cx - rr - off, cy - rr - off, cx + rr - off, cy + rr - off), fill=_fx_lerp(dark, light, t) + (255,))
+    def shine(im, box, a=170):
+        layer = PI.new("RGBA", im.size, (0, 0, 0, 0))
+        PD.Draw(layer).ellipse(box, fill=(255, 255, 255, a))
+        im.alpha_composite(layer)
+    def leaf(d, U, pts): d.polygon([(x * U, y * U) for x, y in pts], fill=(96, 176, 64, 255), outline=(40, 100, 36, 255))
+    def star(cx, cy, ro, ri): return [(cx + (ro if i % 2 == 0 else ri) * math.cos(math.radians(-90 + i * 36)), cy + (ro if i % 2 == 0 else ri) * math.sin(math.radians(-90 + i * 36))) for i in range(10)]
+    def cherry():
+        im, U = new(); d = PD.Draw(im); stem = (84, 130, 52, 255)
+        d.line([(30 * U, 66 * U), (46 * U, 34 * U), (64 * U, 16 * U)], fill=stem, width=int(3.4 * U), joint="curve")
+        d.line([(68 * U, 70 * U), (62 * U, 38 * U), (64 * U, 16 * U)], fill=stem, width=int(3.4 * U), joint="curve")
+        leaf(d, U, [(64, 16), (88, 8), (90, 24), (74, 28)])
+        for x, y, r in ((30, 70, 20), (68, 73, 18)):
+            ball(im, x * U, y * U, r * U, (255, 125, 125), (172, 12, 36), outline=(110, 0, 20)); shine(im, ((x - 10) * U, (y - 12) * U, (x - 2) * U, (y - 4) * U))
+        return fin(im)
+    def lemon():
+        im, U = new(); L = PI.new("RGBA", im.size, (0, 0, 0, 0)); d = PD.Draw(L)
+        for pts in ([(5, 50), (22, 38), (22, 62)], [(95, 50), (78, 38), (78, 62)]):
+            d.polygon([(x * U, y * U) for x, y in pts], fill=(214, 170, 20, 255))
+        d.ellipse((10 * U, 24 * U, 90 * U, 76 * U), fill=(214, 170, 20, 255)); d.ellipse((13 * U, 27 * U, 87 * U, 72 * U), fill=(255, 225, 70, 255)); d.ellipse((22 * U, 31 * U, 62 * U, 46 * U), fill=(255, 247, 175, 210))
+        im.alpha_composite(L.rotate(22, resample=PI.Resampling.BICUBIC, center=(50 * U, 50 * U))); leaf(PD.Draw(im), U, [(66, 20), (88, 8), (90, 26), (74, 28)])
+        return fin(im)
+    def orange():
+        im, U = new(); ball(im, 50 * U, 58 * U, 34 * U, (255, 178, 72), (224, 100, 10), outline=(150, 60, 0)); shine(im, (28 * U, 36 * U, 46 * U, 50 * U))
+        d = PD.Draw(im); leaf(d, U, [(52, 26), (78, 10), (82, 28), (62, 34)]); d.ellipse((45 * U, 20 * U, 56 * U, 31 * U), fill=(110, 70, 30, 255))
+        return fin(im)
+    def grapes():
+        im, U = new(); d = PD.Draw(im)
+        d.line([(50 * U, 34 * U), (53 * U, 12 * U)], fill=(100, 70, 40, 255), width=int(3.6 * U)); leaf(d, U, [(53, 18), (80, 6), (82, 24), (64, 28)])
+        for x, y in [(50, 86), (42, 70), (58, 70), (34, 54), (50, 54), (66, 54), (26, 38), (42, 38), (58, 38), (74, 38)]:
+            ball(im, x * U, y * U, 11 * U, (190, 120, 230), (84, 24, 140), outline=(50, 10, 90), steps=10); shine(im, ((x - 6) * U, (y - 7) * U, (x - 1) * U, (y - 2) * U), 150)
+        return fin(im)
+    def melon():
+        im, U = new(); L = PI.new("RGBA", im.size, (0, 0, 0, 0)); d = PD.Draw(L); cx, cy = 50 * U, 28 * U
+        for r, col in ((47, (24, 92, 38)), (43, (118, 202, 92)), (39, (250, 246, 228)), (35, (236, 52, 72))):
+            d.pieslice((cx - r * U, cy - r * U, cx + r * U, cy + r * U), 0, 180, fill=col + (255,))
+        for x, y in ((36, 46), (50, 54), (64, 46), (43, 62), (57, 62)):
+            d.ellipse(((x - 2.5) * U, (y - 4) * U, (x + 2.5) * U, (y + 4) * U), fill=(30, 20, 20, 255))
+        d.ellipse((24 * U, 34 * U, 42 * U, 42 * U), fill=(255, 255, 255, 90)); im.alpha_composite(L.rotate(12, resample=PI.Resampling.BICUBIC, center=(50 * U, 50 * U)))
+        return fin(im)
+    def starsym():
+        im, U = new(); d = PD.Draw(im)
+        d.polygon([(x * U, y * U) for x, y in star(50, 54, 47, 21)], fill=(176, 108, 8, 255)); d.polygon([(x * U, y * U) for x, y in star(50, 54, 41, 18)], fill=(255, 200, 36, 255))
+        d.polygon([(x * U, y * U) for x, y in star(50, 51, 27, 12)], fill=(255, 236, 120, 255)); shine(im, (40 * U, 24 * U, 52 * U, 34 * U), 190)
+        return fin(im)
+    def bell():
+        im, U = new(); d = PD.Draw(im)
+        def shape(col, k):
+            d.ellipse(((24 + k) * U, (14 + k) * U, (76 - k) * U, (66 - k) * U), fill=col); d.polygon([((24 + k) * U, 40 * U), ((76 - k) * U, 40 * U), ((90 - k) * U, (76 - k) * U), ((10 + k) * U, (76 - k) * U)], fill=col)
+            d.rounded_rectangle(((8 + k) * U, (72 + k) * U, (92 - k) * U, (86 - k) * U), int(6 * U), fill=col)
+        shape((160, 98, 10, 255), 0); shape((255, 200, 40, 255), 3); d.ellipse((44 * U, 4 * U, 56 * U, 16 * U), fill=(176, 108, 8, 255))
+        d.ellipse((42 * U, 84 * U, 58 * U, 100 * U), fill=(176, 108, 8, 255)); d.ellipse((44 * U, 86 * U, 56 * U, 98 * U), fill=(255, 210, 60, 255)); shine(im, (32 * U, 24 * U, 46 * U, 52 * U), 140)
+        return fin(im)
+    def gem():
+        im, U = new(); d = PD.Draw(im)
+        for pts, col in (([(28, 26), (72, 26), (92, 46), (50, 92), (8, 46)], (10, 70, 150)), ([(28, 26), (72, 26), (62, 46), (38, 46)], (130, 214, 255)), ([(8, 46), (28, 26), (38, 46)], (76, 172, 242)),
+                         ([(92, 46), (72, 26), (62, 46)], (60, 150, 232)), ([(8, 46), (38, 46), (50, 92)], (36, 128, 214)), ([(92, 46), (62, 46), (50, 92)], (18, 92, 172)), ([(38, 46), (62, 46), (50, 92)], (70, 172, 246))):
+            d.polygon([(x * U, y * U) for x, y in pts], fill=col + (255,))
+        d.line([(x * U, y * U) for x, y in [(28, 26), (72, 26), (92, 46), (50, 92), (8, 46), (28, 26)]], fill=(8, 50, 120, 255), width=int(2.2 * U), joint="curve"); shine(im, (34 * U, 28 * U, 46 * U, 36 * U), 200)
+        return fin(im)
+    def machine():
+        im, U = new(); d = PD.Draw(im)
+        d.line([(82 * U, 38 * U), (92 * U, 22 * U)], fill=(170, 172, 184, 255), width=int(4 * U)); d.ellipse((86 * U, 12 * U, 99 * U, 25 * U), fill=(255, 60, 60, 255), outline=(120, 0, 0, 255), width=int(1.5 * U))
+        d.rounded_rectangle((14 * U, 12 * U, 82 * U, 92 * U), int(9 * U), fill=(196, 22, 42, 255), outline=(242, 192, 60, 255), width=int(3.2 * U))
+        d.rounded_rectangle((22 * U, 24 * U, 74 * U, 56 * U), int(4 * U), fill=(255, 250, 235, 255), outline=(120, 70, 10, 255), width=int(2 * U))
+        for x in (32, 48, 64):
+            d.text((x * U, 41 * U), "7", font=_fx_font(int(24 * U)), fill=(214, 22, 30, 255), anchor="mm")
+        d.rounded_rectangle((26 * U, 66 * U, 70 * U, 82 * U), int(3 * U), fill=(70, 10, 18, 255)); shine(im, (20 * U, 16 * U, 36 * U, 22 * U), 120)
+        return fin(im)
+    def clover():
+        im, U = new(); d = PD.Draw(im); d.line([(50 * U, 52 * U), (60 * U, 80 * U), (72 * U, 92 * U)], fill=(36, 110, 46, 255), width=int(3.6 * U), joint="curve")
+        for a in (45, 135, 225, 315):
+            ball(im, (50 + 18 * math.cos(math.radians(a))) * U, (46 + 18 * math.sin(math.radians(a))) * U, 18 * U, (130, 230, 110), (24, 130, 50), outline=(16, 80, 36), steps=12)
+        d.ellipse((44 * U, 40 * U, 56 * U, 52 * U), fill=(30, 120, 50, 255))
+        return fin(im)
+    W, H, RW, RH, GAP, RY = 480, 240, 120, 140, 12, 54
+    sprites = dict(zip(_SLOT_SYMBOLS, [f() for f in (cherry, lemon, orange, grapes, melon, starsym, bell, gem, machine, clover)]))
+    base = PI.new("RGB", (W, H)); d = PD.Draw(base); rx = [(W - (3 * RW + 2 * GAP)) // 2 + i * (RW + GAP) for i in range(3)]
+    for y in range(H):
+        d.line([(0, y), (W, y)], fill=_fx_lerp((46, 22, 90), (12, 6, 30), y / (H - 1)))
+    rng = random.Random(7)
+    for _ in range(80):
+        d.point((rng.randrange(W), rng.randrange(H)), fill=rng.choice([(96, 74, 156), (126, 104, 196), (74, 52, 124)]))
+    d.rounded_rectangle((5, 5, W - 6, H - 6), 24, outline=(236, 186, 64), width=4); d.rounded_rectangle((11, 11, W - 12, H - 12), 19, outline=(130, 78, 24), width=2)
+    for x in rx:
+        d.rounded_rectangle((x - 7, RY - 7, x + RW + 7, RY + RH + 7), 14, fill=(34, 18, 12), outline=(240, 194, 80), width=3)
+    mask = PI.new("L", (RW, RH), 0); md = PD.Draw(mask)
+    for y in range(RH):
+        md.line([(0, y), (RW, y)], fill=int(150 * max(0.0, 1 - min(y, RH - 1 - y) / (RH * 0.30)) ** 1.6))
+    shade = PI.new("RGBA", (RW, RH), (0, 0, 0, 0)); shade.putalpha(mask)
+    pay = PI.new("RGBA", (W, H), (0, 0, 0, 0)); pd = PD.Draw(pay); cy = RY + RH // 2
+    pd.line([(rx[0] - 3, cy), (rx[2] + RW + 3, cy)], fill=(255, 70, 70, 150), width=2)
+    pd.polygon([(rx[0] - 15, cy - 8), (rx[0] - 15, cy + 8), (rx[0] - 4, cy)], fill=(255, 210, 80, 255)); pd.polygon([(rx[2] + RW + 15, cy - 8), (rx[2] + RW + 15, cy + 8), (rx[2] + RW + 4, cy)], fill=(255, 210, 80, 255))
+    _SLOT_ASSETS.update(sprites=sprites, base=base, shade=shade, pay=pay, rx=rx, W=W, H=H, RW=RW, RH=RH, RY=RY, SPR=SPR)
+    return _SLOT_ASSETS
+
+def render_slots(reels, mult, kind, seed=0):
+    """reels: 3 symbols, mult: payout multiplier, kind: 'jackpot' | 'triple' | 'pair' | 'none'. Returns (gif bytes, final png bytes, seconds)."""
+    A = _slot_assets(); W, H, RW, RH, RY, rx, PITCH, DT = A["W"], A["H"], A["RW"], A["RH"], A["RY"], A["rx"], 100, 0.05
+    SPR, GOLD, WHITE = A["SPR"], (255, 226, 90), (255, 255, 255)
+    rng = random.Random(seed or sum(ord(c) for c in "".join(reels)) + int(mult * 7))
+    stops = [1.3, 2.0, 2.7 + (0.9 if reels[0] == reels[1] else 0.0)]
+    Ks = [int(s * 14) + 3 for s in stops]
+    def strip(target, K):
+        N = K + 5
+        st = PI.new("RGB", (RW, N * PITCH), (252, 236, 196))
+        for c in range(N):
+            sym = target if c - 2 == K else rng.choices(_SLOT_SYMBOLS, weights=_SLOT_WEIGHTS)[0]
+            st.paste(A["sprites"][sym], ((RW - SPR) // 2, (N - 1 - c) * PITCH + (PITCH - SPR) // 2), A["sprites"][sym])
+        return st
+    def sample(st, o, K):
+        return st.transform((RW, RH), PI.Transform.AFFINE, (1, 0, 0, 0, 1, (K + 4 - (o + 2)) * PITCH - (RH - PITCH) / 2), resample=PI.Resampling.BILINEAR)
+    def reel(st, o0, o1, K):
+        px = abs(o1 - o0) * PITCH
+        if px < 8:
+            return sample(st, o1, K)
+        n = min(10, int(px / 8) + 1)
+        acc = sample(st, o0, K)
+        for s in range(1, n):
+            acc = PI.blend(acc, sample(st, o0 + (o1 - o0) * s / (n - 1), K), 1.0 / (s + 1))
+        return acc
+    def offset(t, ts, K):
+        if t >= ts:
+            tau = t - ts
+            return K + 0.10 * math.sin(tau * 26) * math.exp(-tau * 9)
+        return K * (1 - (1 - t / ts) ** 3)
+    def sparkle(d, x, y, s, a):
+        d.polygon([(x, y - s), (x + s * .22, y - s * .22), (x + s, y), (x + s * .22, y + s * .22), (x, y + s), (x - s * .22, y + s * .22), (x - s, y), (x - s * .22, y - s * .22)], fill=(255, 250, 200, a))
+    strips = [strip(reels[i], Ks[i]) for i in range(3)]
+    big = kind in ("jackpot", "triple")
+    win = [0, 1, 2] if big else ([i for i in range(3) if reels.count(reels[i]) >= 2] if (mult > 0 and kind == "pair") else [])
+    n_spin = int((stops[2] + 0.35) / DT) + 1
+    n_fx = 34 if kind == "jackpot" else 22 if win else 7
+    glow = PI.new("RGBA", (W, H), (0, 0, 0, 0)); gd = PD.Draw(glow)
+    for i in win:
+        gd.rounded_rectangle((rx[i] - 4, RY - 4, rx[i] + RW + 4, RY + RH + 4), 12, outline=(255, 226, 90, 255) if (mult >= 2 or big) else (160, 220, 255, 255), width=7)
+    glow = glow.filter(PFl.GaussianBlur(5)); ga = glow.split()[3]
+    sparks = [(rx[i] + RW / 2 + rng.uniform(-50, 50), RY + RH / 2 + rng.uniform(-58, 58), rng.randint(0, n_fx // 2), rng.randint(7, 11), rng.uniform(7, 15)) for i in win for _ in range(7)]
+    confetti = [(rng.uniform(0, W), rng.uniform(-H, 0), rng.uniform(-40, 40), rng.uniform(150, 260), rng.uniform(0, 6.28), rng.uniform(-6, 6),
+                 rng.choice([(255, 80, 80), (255, 210, 60), (90, 200, 255), (130, 255, 140), (255, 120, 230)]), rng.uniform(5, 9)) for _ in range(70)] if kind == "jackpot" else []
+    frames, prev = [], [0.0] * 3
+    for k in range(n_spin + n_fx):
+        t = k * DT
+        os_ = [offset(t, stops[i], Ks[i]) for i in range(3)]
+        img = A["base"].copy()
+        for i in range(3):
+            r = reel(strips[i], prev[i], os_[i], Ks[i]).convert("RGBA")
+            r.alpha_composite(A["shade"])
+            img.paste(r.convert("RGB"), (rx[i], RY))
+        prev = os_
+        fx = k - n_spin + 1
+        d = PD.Draw(img)
+        for j in range(11):
+            c = (255, 214, 90) if (j + k // 2) % 2 == 0 else (112, 82, 44)
+            for x in (30 + j * 8, W - 30 - j * 8):
+                d.ellipse((x - 3, 19, x + 3, 25), fill=c)
+        flash = GOLD if (k // 2) % 2 == 0 else WHITE
+        title, tc = ("JACKPOT!", flash) if (kind == "jackpot" and fx > 0) else ("WIN!", flash) if (big and fx > 0) else ("SLOTS", GOLD)
+        d.text((W // 2, 24), title, font=_fx_font(26), fill=tc, anchor="mm", stroke_width=2, stroke_fill=(70, 30, 0))
+        img = img.convert("RGBA")
+        img.alpha_composite(A["pay"])
+        if fx > 0 and win:
+            pulse = 1.0 if fx >= n_fx else 0.55 + 0.45 * math.sin(fx * 0.9)
+            g = glow.copy(); g.putalpha(ga.point(lambda v, p=pulse: int(v * p))); img.alpha_composite(g)
+            if fx < n_fx:
+                ov = PI.new("RGBA", (W, H), (0, 0, 0, 0)); od = PD.Draw(ov)
+                for x, y, born, life, size in sparks:
+                    age = fx - born
+                    if 0 <= age < life:
+                        sparkle(od, x, y, size * math.sin(math.pi * age / life), int(255 * (1 - age / life) ** 0.5))
+                for x0, y0, vx, vy, rot, rs, col, sz in confetti:
+                    tt = fx * DT; cx, cy, a = x0 + vx * tt, y0 + vy * tt, rot + rs * tt
+                    if -10 < cy < H + 10:
+                        od.polygon([(cx + sz * math.cos(a + q), cy + sz * .6 * math.sin(a + q)) for q in (0.8, 2.4, 3.9, 5.5)], fill=col + (235,))
+                img.alpha_composite(ov)
+        elif fx > 0:
+            img.alpha_composite(PI.new("RGBA", (W, H), (0, 0, 0, int(55 * min(1, fx / 6)))))
+        frames.append(img.convert("RGB"))
+    return _fx_gif(frames, int(DT * 1000)), _fx_png(frames[-1]), (len(frames) - 1) * DT
+
+# ---------------- coin flip ----------------
+def render_coin(result, won, word):
+    """A coin is tossed, spins and lands on `result` ('heads'|'tails'). word: the localised label shown at the end."""
+    W, H, R, S, DT = 400, 240, 54, 4, 0.05
+    def face(kind):
+        sz = 2 * R * S; im = PI.new("RGBA", (sz, sz), (0, 0, 0, 0)); d = PD.Draw(im); c = sz / 2
+        for r, col in ((R, (150, 96, 10)), (R - 2, (255, 214, 80)), (R - 8, (214, 150, 20)), (R - 11, (255, 228, 120))):
+            d.ellipse((c - r * S, c - r * S, c + r * S, c + r * S), fill=col + (255,))
+        if kind == "heads":
+            pts = [(-24, 12), (-24, -14), (-12, -2), (0, -20), (12, -2), (24, -14), (24, 12)]
+            d.polygon([(c + x * S, c + y * S) for x, y in pts], fill=(150, 90, 0, 255)); d.rectangle((c - 24 * S, c + 12 * S, c + 24 * S, c + 20 * S), fill=(150, 90, 0, 255))
+            for x, y in ((-24, -14), (0, -20), (24, -14)):
+                d.ellipse((c + (x - 4) * S, c + (y - 4) * S, c + (x + 4) * S, c + (y + 4) * S), fill=(150, 90, 0, 255))
+            d.polygon([(c + (x * 0.8) * S, c + (y * 0.8 - 1) * S) for x, y in pts[:-1] + [(24, 8)]], fill=(255, 236, 140, 200))
+        else:
+            d.text((c, c - 2 * S), "V", font=_fx_font(int(46 * S)), fill=(150, 90, 0, 255), anchor="mm")
+            for i in range(12):
+                a = math.radians(i * 30)
+                d.ellipse((c + (R - 6) * math.cos(a) * S - 2 * S, c + (R - 6) * math.sin(a) * S - 2 * S, c + (R - 6) * math.cos(a) * S + 2 * S, c + (R - 6) * math.sin(a) * S + 2 * S), fill=(150, 90, 0, 255))
+        return im.resize((2 * R, 2 * R), PI.Resampling.LANCZOS)
+    heads, tails = face("heads"), face("tails")
+    bg = PI.new("RGB", (W, H)); bd = PD.Draw(bg)
+    for y in range(H):
+        bd.line([(0, y), (W, y)], fill=_fx_lerp((40, 28, 84), (12, 8, 30), y / (H - 1)))
+    rng = random.Random(5)
+    for _ in range(60):
+        bd.point((rng.randrange(W), rng.randrange(H)), fill=rng.choice([(96, 74, 156), (126, 104, 196)]))
+    bd.rounded_rectangle((5, 5, W - 6, H - 6), 22, outline=(236, 186, 64), width=3)
+    floor_y, cx, N, T_fly = 188, W // 2, (8 if result == "heads" else 9), 1.6
+    n_fly, frames = int(T_fly / DT), []
+    for k in range(n_fly + 14 + 14):
+        t = k * DT
+        if t <= T_fly:
+            p = t / T_fly; lift = 4 * p * (1 - p); th = math.pi * N * (1 - (1 - p) ** 2)
+        else:
+            tau = t - T_fly; lift = 0.11 * abs(math.sin(tau * 9)) * math.exp(-tau * 4); th = math.pi * N
+        cosv = math.cos(th); sc = max(0.05, abs(cosv)); cy = floor_y - R - 120 * lift
+        img = bg.copy().convert("RGBA"); ov = PI.new("RGBA", (W, H), (0, 0, 0, 0)); od = PD.Draw(ov)
+        sw = R * (1.0 - 0.45 * lift * 2.0); od.ellipse((cx - sw, floor_y - 6, cx + sw, floor_y + 8 + 4 * (1 - lift)), fill=(0, 0, 0, int(110 * (1 - lift))))
+        img.alpha_composite(ov)
+        spr = (heads if cosv > 0 else tails).resize((2 * R, max(2, int(2 * R * sc))), PI.Resampling.BILINEAR)
+        thick = int(9 * math.sqrt(max(0.0, 1 - sc * sc))); d = PD.Draw(img); hh = spr.size[1] / 2
+        for i in range(thick, 0, -1):
+            d.ellipse((cx - R, cy - hh + i, cx + R, cy + hh + i), fill=(150, 96, 10, 255))
+        img.alpha_composite(spr, (int(cx - R), int(cy - hh)))
+        fx = k - (n_fly + 14)
+        if fx >= 0:
+            a = int(255 * min(1, (fx + 1) / 5)); od2 = PD.Draw(img)
+            od2.text((cx, 226 - 22), word.upper(), font=_fx_font(30), fill=(255, 226, 90, a), anchor="mm", stroke_width=2, stroke_fill=(70, 30, 0, a))
+            if won:
+                for q in range(6):
+                    ang = q * 1.05 + fx * 0.3; rr = 70 + fx * 5; sx, sy = cx + rr * math.cos(ang), floor_y - R + rr * 0.55 * math.sin(ang)
+                    s = 9 * math.sin(math.pi * min(1, (fx + 1) / 14)); od2.polygon([(sx, sy - s), (sx + s * .25, sy - s * .25), (sx + s, sy), (sx + s * .25, sy + s * .25), (sx, sy + s), (sx - s * .25, sy + s * .25), (sx - s, sy), (sx - s * .25, sy - s * .25)], fill=(255, 250, 200, 230))
+            else:
+                img.alpha_composite(PI.new("RGBA", (W, H), (60, 0, 10, int(60 * min(1, (fx + 1) / 6)))))
+        frames.append(img.convert("RGB"))
+    return _fx_gif(frames, int(DT * 1000)), _fx_png(frames[-1]), (len(frames) - 1) * DT
+
+# ---------------- playing cards (own drawing: suits are polygons and circles, no font glyphs) ----------------
+CARD_SUITS = ["♠️", "♥️", "♦️", "♣️"]
+_SUIT_KEY = {"♠": "s", "♥": "h", "♦": "d", "♣": "c"}
+_CARD_RED, _CARD_INK = (204, 30, 52), (26, 26, 36)
+_CARD_BRAND, _CARD_GOLD = (63, 50, 150), (236, 186, 64)
+
+def _suit_shape(d, suit, cx, cy, size, col):
+    """Draw one suit symbol with its centre at (cx, cy); size is the full height in pixels."""
+    r = size / 2
+    if suit == "d":
+        d.polygon([(cx, cy - r), (cx + r * 0.74, cy), (cx, cy + r), (cx - r * 0.74, cy)], fill=col)
+    elif suit == "h":
+        q = r * 0.52
+        for sx in (-1, 1):
+            d.ellipse((cx + sx * r * 0.47 - q, cy - r * 0.38 - q, cx + sx * r * 0.47 + q, cy - r * 0.38 + q), fill=col)
+        d.polygon([(cx - r * 0.97, cy - r * 0.22), (cx + r * 0.97, cy - r * 0.22), (cx, cy + r * 0.98)], fill=col)
+    elif suit == "s":
+        q = r * 0.5
+        for sx in (-1, 1):
+            d.ellipse((cx + sx * r * 0.45 - q, cy + r * 0.12 - q, cx + sx * r * 0.45 + q, cy + r * 0.12 + q), fill=col)
+        d.polygon([(cx - r * 0.95, cy + r * 0.02), (cx + r * 0.95, cy + r * 0.02), (cx, cy - r * 0.98)], fill=col)
+        d.polygon([(cx, cy + r * 0.15), (cx - r * 0.34, cy + r), (cx + r * 0.34, cy + r)], fill=col)
+    else:
+        q = r * 0.31
+        for ox, oy in ((0, -0.42), (-0.44, 0.1), (0.44, 0.1)):
+            d.ellipse((cx + ox * r - q, cy + oy * r - q, cx + ox * r + q, cy + oy * r + q), fill=col)
+        d.ellipse((cx - q * 0.7, cy - q * 0.6, cx + q * 0.7, cy + q * 0.8), fill=col)
+        d.polygon([(cx, cy), (cx - r * 0.3, cy + r), (cx + r * 0.3, cy + r)], fill=col)
+
+def _draw_card(cv, x, y, w, h, card=None, dim=False):
+    """One card on a _Cv canvas. card=None draws the Versa card back."""
+    k = cv.k
+    cv.rr((x + 2, y + 3, x + w + 2, y + h + 3), w * 0.09, fill=(0, 0, 0, 90))
+    if card is None:
+        cv.rr((x, y, x + w, y + h), w * 0.09, fill=_CARD_BRAND + (255,), outline=(240, 236, 255, 255), width=max(1.5, w / 40))
+        ix0, iy0, ix1, iy1 = x + w * 0.1, y + h * 0.08, x + w * 0.9, y + h * 0.92
+        cv.rr((ix0, iy0, ix1, iy1), w * 0.05, outline=_CARD_GOLD + (255,), width=max(1, w / 60))
+        lw, lh = max(1, int((ix1 - ix0) * k)), max(1, int((iy1 - iy0) * k))
+        tile = PI.new("RGB", (lw, lh), _CARD_BRAND)
+        td, step = PD.Draw(tile), w / 6 * k
+        for i in range(-14, 14):
+            x0 = i * step
+            td.line([(x0, 0), (x0 + lh, lh)], fill=(92, 78, 186), width=max(1, int(k)))
+            td.line([(x0 + lh, 0), (x0, lh)], fill=(92, 78, 186), width=max(1, int(k)))
+        cv.im.paste(tile, (int(ix0 * k), int(iy0 * k)))
+        cv.rr((x, y, x + w, y + h), w * 0.09, outline=(240, 236, 255, 255), width=max(1.5, w / 40))
+        cv.rr((ix0, iy0, ix1, iy1), w * 0.05, outline=_CARD_GOLD + (255,), width=max(1, w / 60))
+        cv.ell((x + w / 2 - w * 0.2, y + h / 2 - w * 0.2, x + w / 2 + w * 0.2, y + h / 2 + w * 0.2), fill=_CARD_BRAND + (255,), outline=_CARD_GOLD + (255,), width=max(1, w / 60))
+        cv.text((x + w / 2, y + h / 2 + 1), "V", w * 0.26, _CARD_GOLD, anchor="mm")
+        return
+    v, s = card[0], _SUIT_KEY.get(str(card[1])[:1], "s")
+    col = _CARD_RED if s in "hd" else _CARD_INK
+    cv.rr((x, y, x + w, y + h), w * 0.09, fill=(250, 248, 242, 255), outline=(196, 192, 182, 255), width=max(1, w / 60))
+    fs = h * (0.16 if len(v) == 1 else 0.145)
+    cv.text((x + w * 0.17, y + h * 0.13), v, fs, col, anchor="mm")
+    _suit_shape(cv.d, s, (x + w * 0.17) * k, (y + h * 0.27) * k, h * 0.1 * k, col)
+    cv.text((x + w * 0.83, y + h * 0.87), v, fs, col, anchor="mm")
+    _suit_shape(cv.d, s, (x + w * 0.83) * k, (y + h * 0.73) * k, h * 0.1 * k, col)
+    if v in ("J", "Q", "K"):
+        tint = (252, 228, 230) if s in "hd" else (226, 230, 246)
+        cv.rr((x + w * 0.28, y + h * 0.2, x + w * 0.72, y + h * 0.8), w * 0.05, fill=tint + (255,), outline=col + (255,), width=max(1, w / 70))
+        cv.text((x + w / 2, y + h * 0.42), v, h * 0.24, col, anchor="mm")
+        _suit_shape(cv.d, s, (x + w / 2) * k, (y + h * 0.64) * k, h * 0.14 * k, col)
+    else:
+        _suit_shape(cv.d, s, (x + w / 2) * k, (y + h / 2) * k, h * (0.44 if v == "A" else 0.34) * k, col)
+    if dim:
+        cv.rr((x, y, x + w, y + h), w * 0.09, fill=(0, 0, 0, 110))
+
+def _felt(cv, W, H):
+    cv.grad((0, 0, W, H), (22, 104, 70), (10, 58, 40), vertical=True, radius=22)
+    cv.rr((3, 3, W - 3, H - 3), 20, outline=_CARD_GOLD + (255,), width=3)
+
+def _cards_row(cv, cards, x, y, w, h, max_w, hidden_from=None):
+    """Cards left to right, overlapping when they do not fit into max_w."""
+    n = len(cards)
+    step = w + 8 if n <= 1 else min(w + 8, (max_w - w) / (n - 1))
+    for i, c in enumerate(cards):
+        _draw_card(cv, x + i * step, y, w, h, None if (hidden_from is not None and i >= hidden_from) else c)
+
+def render_bj_table(dealer, hide_hole, seats, labels):
+    """seats: [{'name', 'hand', 'value', 'tag', 'turn', 'tone'}]; labels: {'dealer'}; tone: 'win'|'lose'|'push'|None. PNG bytes."""
+    n = max(1, len(seats))
+    cols = 1 if n == 1 else 2
+    rows = (n + cols - 1) // cols
+    W = 720
+    CW, CH = (78, 109) if n == 1 else (62, 87)
+    PH = CH + 64
+    top = 34 + 109 + 26
+    H = top + rows * (PH + 12) + 6
+    cv = _Cv(W, H, k=2)
+    _felt(cv, W, H)
+    dv = "?" if hide_hole else str(hand_value(dealer))
+    cv.text((W / 2, 22), f"{labels.get('dealer', 'Dealer')} · {dv}".upper(), 17, (255, 236, 170), anchor="mm")
+    dw = min(78 + (len(dealer) - 1) * 86, W - 80)
+    _cards_row(cv, dealer, (W - dw) / 2, 34, 78, 109, dw, hidden_from=1 if hide_hole else None)
+    pw = (W - 16 * (cols + 1)) / cols
+    for i, s in enumerate(seats):
+        cx0 = 16 + (i % cols) * (pw + 16)
+        cy0 = top + (i // cols) * (PH + 12)
+        tone = s.get("tone")
+        edge = (255, 214, 90) if s.get("turn") else (87, 242, 135) if tone == "win" else (237, 66, 69) if tone == "lose" else (160, 200, 180)
+        cv.rr((cx0, cy0, cx0 + pw, cy0 + PH), 14, fill=(0, 0, 0, 70), outline=edge + (255,), width=3 if s.get("turn") or tone else 1.5)
+        name = cv.safe(s.get("name", "?"), 16, pw - 110)
+        cv.text((cx0 + 14, cy0 + 18), name, 16, (255, 255, 255), anchor="lm")
+        badge = str(s.get("value", ""))
+        bw = cv.width(badge, 15) + 18
+        cv.rr((cx0 + pw - bw - 10, cy0 + 7, cx0 + pw - 10, cy0 + 29), 11, fill=edge + (255,))
+        cv.text((cx0 + pw - bw / 2 - 10, cy0 + 18), badge, 15, (20, 20, 28), anchor="mm")
+        _cards_row(cv, s.get("hand", []), cx0 + 14, cy0 + 36, CW, CH, pw - 28)
+        tag = s.get("tag") or ""
+        if tag:
+            cv.text((cx0 + pw / 2, cy0 + PH - 12), cv.safe(tag, 14, pw - 20), 14, edge, anchor="mm")
+    return _fx_png(cv.out())
+
+def render_hl(current, nxt, history, mult, amount_text, banner=None, tone=None, title="HIGHER · LOWER"):
+    """Higher-Lower table: current card, the next card (face down while waiting), history strip, multiplier. PNG bytes."""
+    W, H = 640, 270
+    cv = _Cv(W, H, k=2)
+    _felt(cv, W, H)
+    _draw_card(cv, 34, 44, 136, 190, current)
+    _draw_card(cv, 196, 44, 136, 190, nxt, dim=(tone == "lose"))
+    cv.text((183, 139), "›", 34, (255, 236, 170), anchor="mm")
+    col = (87, 242, 135) if tone == "win" else (237, 66, 69) if tone == "lose" else (255, 226, 90)
+    cv.text((488, 40), cv.safe(title, 15, 250), 15, (255, 236, 170), anchor="mm")
+    cv.text((488, 86), f"×{mult:,.2f}", 40, col, anchor="mm")
+    cv.text((488, 126), cv.safe(amount_text, 22, 250), 22, (255, 255, 255), anchor="mm")
+    hist = history[-6:]
+    for i, c in enumerate(hist):
+        _draw_card(cv, 370 + i * 40, 160, 36, 50, c, dim=True)
+    if banner:
+        cv.rr((60, 112, 306, 168), 12, fill=(16, 14, 30, 225), outline=col + (255,), width=2.5)
+        cv.text((183, 140), cv.safe(banner, 24, 230), 24, col, anchor="mm")
+    return _fx_png(cv.out())
+
+# ============================================================
+# V3 - store / inventory buttons, Higher-Lower, multiplayer blackjack, forceban, per-language .work, animated slots + coin
+# ============================================================
+def _can_attach(channel):
+    """The bot may upload pictures here (a server can deny Attach Files / Embed Links per channel)."""
+    try:
+        p = channel.permissions_for(channel.guild.me)
+        return bool(p.attach_files and p.embed_links)
+    except Exception:
+        return True
+
+async def _fx_attach(embed, name, fn, *args, timeout=6.0, channel=None):
+    """Render a picture in a worker thread and put it into the embed. [] when Pillow is missing, the channel does not
+    allow uploads or rendering failed - the caller then shows the text version."""
+    if channel is not None and not _can_attach(channel):
+        return []
+    try:
+        data = await fx_run(fn, *args, timeout=timeout)
+    except Exception:
+        return []
+    embed.set_image(url=f"attachment://{name}")
+    return [discord.File(io.BytesIO(data), filename=name)]
+
+def _quiet():
+    return discord.AllowedMentions.none()
+
+class BaseLayout(discord.ui.LayoutView):
+    """Components-v2 twin of BaseView: same bot-ban / server-ban / language checks."""
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return await BaseView.interaction_check(self, interaction)
+
+    def disable_all(self):
+        for item in self.walk_children():
+            if hasattr(item, "disabled"):
+                item.disabled = True
+
+# ---------- store: a Buy button under every item; inventory: a Use button under every owned item ----------
+STORE_PAGE = 6
+
+def _item_text(guild, item, count=None):
+    role = guild.get_role(int(item["role"])) if item.get("role") else None
+    head = f"### {item['name']}" + (f"  ×{count}" if count else "")
+    line = L("💰 **${:,}**", item["price"]) if count is None else ""
+    if role:
+        line = (line + " · " if line else "") + L("🎭 Role: {}", role.mention)
+    desc = (item.get("description") or "").strip()
+    if desc and desc != "No description":
+        line = (line + "\n" if line else "") + desc
+    return head + ("\n" + line if line else "")
+
+def _store_item_by_name(gid, name):
+    return next((it for it in estore_db.get(str(gid), {}).values() if it["name"].lower() == (name or "").lower()), None)
+
+def buy_store_item(gid, uid, key):
+    """(ok, message). Takes the price from the wallet and puts the item into the inventory."""
+    item = estore_db.get(str(gid), {}).get(key)
+    if not item:
+        return False, L("❌ This item is no longer in the store.")
+    econ = get_econ(gid, uid)
+    if econ["wallet"] < item["price"]:
+        return False, L('❌ You need **${:,}** but only have **${:,}**!', item["price"], econ["wallet"])
+    econ["wallet"] -= item["price"]
+    econ["inventory"].append(item["name"])          # the role is only given when the item is USED
+    save_econ()
+    return True, L("✅ You bought **{}** for **${:,}**. Wallet: **${:,}**", item["name"], item["price"], econ["wallet"])
+
+async def use_store_item(guild, member, name):
+    """(ok, message). Gives the item's role (if it has one) and removes one piece from the inventory."""
+    inventory = get_econ(guild.id, member.id)["inventory"]
+    found = next((i for i in inventory if i.lower() == (name or "").lower()), None)
+    if not found:
+        return False, L("❌ You don't have `{}`! Check your inventory.", name)
+    data = _store_item_by_name(guild.id, found)
+    role = guild.get_role(int(data["role"])) if data and data.get("role") else None
+    if role:
+        if not role_assignable(guild, role):
+            return False, L("❌ This item's role can no longer be given (permissions or hierarchy changed). Ask an admin.")
+        try:
+            await member.add_roles(role, reason=f"Store item used: {found}")
+        except Exception as e:
+            return False, f"❌ {e}"
+    inventory.remove(found)
+    save_econ()
+    if role:
+        return True, L("✅ Used **{}** - you got {}!", found, role.mention)
+    return True, L("✅ Used **{}**.", found)
+
+async def _store_gate(interaction):
+    """Feature switch + per-user restriction for store buttons (True = go on)."""
+    return await slash_check_feature(interaction, "estore")
+
+class _PagedLayout(BaseLayout):
+    def __init__(self, guild, timeout=300):
+        super().__init__(timeout=timeout)
+        self.guild, self.page, self.message = guild, 0, None
+
+    def _nav(self, box, pages):
+        if pages <= 1:
+            return
+        prev = discord.ui.Button(label="◀", style=discord.ButtonStyle.grey, disabled=self.page == 0)
+        info = discord.ui.Button(label=f"{self.page + 1}/{pages}", style=discord.ButtonStyle.grey, disabled=True)
+        nxt = discord.ui.Button(label="▶", style=discord.ButtonStyle.grey, disabled=self.page >= pages - 1)
+
+        async def go(interaction, delta):
+            self.page += delta
+            self.build()
+            await interaction.response.edit_message(view=self, allowed_mentions=_quiet())
+        prev.callback = lambda i: go(i, -1)
+        nxt.callback = lambda i: go(i, 1)
+        box.add_item(discord.ui.ActionRow(prev, info, nxt))
+
+    async def on_timeout(self):
+        if self.message:
+            self.disable_all()
+            try:
+                await self.message.edit(view=self, allowed_mentions=_quiet())
+            except Exception:
+                pass
+
+class StoreLayout(_PagedLayout):
+    def __init__(self, guild):
+        super().__init__(guild)
+        self.build()
+
+    def build(self):
+        self.clear_items()
+        guild = self.guild
+        items = list(estore_db.get(str(guild.id), {}).items())
+        pages = max(1, -(-len(items) // STORE_PAGE))
+        self.page = max(0, min(self.page, pages - 1))
+        pfx = get_settings(guild.id).get("prefix", ".")
+        box = discord.ui.Container(accent_colour=0xff6b35)
+        box.add_item(discord.ui.TextDisplay(L("## 🛒 {} Store", guild.name) + "\n" + L("Press **Buy** under an item. Your items are in `{}inv`.", pfx)))
+        if not items:
+            box.add_item(discord.ui.TextDisplay(L('🛒 The store is empty!')))
+        for key, item in items[self.page * STORE_PAGE:(self.page + 1) * STORE_PAGE]:
+            box.add_item(discord.ui.Separator())
+            box.add_item(discord.ui.TextDisplay(_item_text(guild, item)))
+            btn = discord.ui.Button(label=L("Buy"), emoji="🛒", style=discord.ButtonStyle.green)
+            btn.callback = self._buyer(key)
+            box.add_item(discord.ui.ActionRow(btn))
+        self._nav(box, pages)
+        self.add_item(box)
+
+    def _buyer(self, key):
+        async def cb(interaction: discord.Interaction):
+            if not await _store_gate(interaction):
+                return
+            ok, msg = buy_store_item(interaction.guild.id, interaction.user.id, key)
+            await interaction.response.send_message(msg, ephemeral=True)
+        return cb
+
+class InventoryLayout(_PagedLayout):
+    def __init__(self, guild, member, viewer_id):
+        super().__init__(guild)
+        self.member, self.owner = member, viewer_id == member.id
+        self.build()
+
+    def build(self):
+        self.clear_items()
+        guild, member = self.guild, self.member
+        counts = list(collections.Counter(get_econ(guild.id, member.id).get("inventory", [])).items())
+        pages = max(1, -(-len(counts) // STORE_PAGE))
+        self.page = max(0, min(self.page, pages - 1))
+        box = discord.ui.Container(accent_colour=0xff6b35)
+        box.add_item(discord.ui.TextDisplay(L("## 🎒 {}'s Inventory", member.display_name)))
+        if not counts:
+            box.add_item(discord.ui.TextDisplay(L("*No items yet!*")))
+        for name, n in counts[self.page * STORE_PAGE:(self.page + 1) * STORE_PAGE]:
+            item = _store_item_by_name(guild.id, name) or {"name": name, "price": 0}
+            box.add_item(discord.ui.Separator())
+            box.add_item(discord.ui.TextDisplay(_item_text(guild, dict(item, name=name), count=n)))
+            if self.owner:
+                btn = discord.ui.Button(label=L("Use"), emoji="✨", style=discord.ButtonStyle.blurple)
+                btn.callback = self._user(name)
+                box.add_item(discord.ui.ActionRow(btn))
+        self._nav(box, pages)
+        self.add_item(box)
+
+    def _user(self, name):
+        async def cb(interaction: discord.Interaction):
+            if interaction.user.id != self.member.id:
+                await interaction.response.send_message(L("❌ This is not your inventory!"), ephemeral=True)
+                return
+            if not await _store_gate(interaction):
+                return
+            ok, msg = await use_store_item(interaction.guild, interaction.user, name)
+            self.build()
+            await interaction.response.edit_message(view=self, allowed_mentions=_quiet())
+            await interaction.followup.send(msg, ephemeral=True)
+        return cb
+
+@bot.command(name="estore", aliases=["store", "shop"])
+@feature_required("estore")
+async def estore_p(ctx):
+    view = StoreLayout(ctx.guild)
+    view.message = await ctx.send(view=view, allowed_mentions=_quiet())
+
+@bot.tree.command(name="estore", description="Show the economy store")
+@app_commands.guild_only()
+async def estore_s(interaction: discord.Interaction):
+    if not await slash_check_feature(interaction, "estore"):
+        return
+    view = StoreLayout(interaction.guild)
+    await interaction.response.send_message(view=view, allowed_mentions=_quiet())
+    try:
+        view.message = await interaction.original_response()
+    except Exception:
+        pass
+
+@bot.command(name="buy")
+@feature_required("estore")
+async def buy_p(ctx, *, item_name: str = None):
+    name = _clean_name(item_name)
+    if not name:
+        await ctx.send(L('❌ Usage: `{}`', '.buy <item name>'), delete_after=5)
+        return
+    key = next((k for k, it in estore_db.get(str(ctx.guild.id), {}).items() if it["name"].lower() == name.lower()), None)
+    if key is None:
+        await ctx.send(L('❌ Item `{}` was not found! Use the store command to see all items.', name), delete_after=8)
+        return
+    ok, msg = buy_store_item(ctx.guild.id, ctx.author.id, key)
+    pfx = get_settings(ctx.guild.id).get("prefix", ".")
+    embed = discord.Embed(description=msg, color=0x57F287 if ok else 0xED4245)
+    if ok:
+        embed.set_footer(text=L("Open {}inv and press Use to use it.", pfx))
+    await ctx.send(embed=embed)
+
+@bot.command(name="inv", aliases=["inventory"])
+@feature_required("estore")
+async def inv_p(ctx, member: discord.Member = None):
+    view = InventoryLayout(ctx.guild, member or ctx.author, ctx.author.id)
+    view.message = await ctx.send(view=view, allowed_mentions=_quiet())
+
+# ---------- .work: own joke set per language (not translations - different lines for each audience) ----------
+WORK_LINES = {
+    "en": [
+        "You held the boss's coffee through a 2-hour meeting that could have been an email.",
+        "You fixed the office printer by turning it off and on again. Legend.",
+        "You walked a dog. Honestly, the dog walked you.",
+        "You said \"please pull forward to the window\" 214 times at a drive-thru.",
+        "You stood in line for a sneaker drop for someone else.",
+        "You tested mattresses for six hours. Tough job, someone had to do it.",
+        "You taught your grandma how to unmute herself on a video call.",
+        "You carried a couch up three floors shouting PIVOT.",
+        "You approved 30 pull requests with \"LGTM\" without reading them.",
+        "You were paid in exposure... and, luckily, in coins too.",
+        "You built flat-pack furniture and only four screws were left over.",
+        "You delivered a pizza to the wrong house and they paid anyway.",
+        "You were the person who says \"you're on mute\" in every meeting.",
+        "You guarded a parking spot for your friend for 40 minutes.",
+        "You restarted the Wi-Fi router for the whole family. Hero.",
+        "You were an extra in a movie: \"man walking past, slightly confused\".",
+        "You read the terms and conditions for a client. All of them.",
+        "You babysat a houseplant while its owner was on holiday.",
+    ],
+    "tr": [
+        "İnşaatta ustanın su şişesini tuttun.",
+        "Çay ocağında 47 çay demledin, 3'ü bardağa ulaştı.",
+        "Düğünde takı merasimini anons ettin: \"Damadın dayısından bir çeyrek altın!\"",
+        "Minibüste \"Uzatır mısın?\" zincirinin en önemli halkası oldun.",
+        "Bakkal amcanın yerine 5 dakika dükkana baktın, 3 ekmek sattın.",
+        "Halı sahada kimse istemediği için kaleye geçtin.",
+        "Teyzenin telefonundaki 400 \"Günaydın\" mesajını sildin.",
+        "Simitçinin tablasını Taksim'den Kadıköy'e taşıdın.",
+        "Pazarda \"Gel abla gel, domates bunlar!\" diye bağırdın.",
+        "Kahvehanede okey masasının dördüncüsü oldun.",
+        "Annenin \"gelirken şunu da al\" listesini eksiksiz tamamladın.",
+        "Kombinin başında usta gibi \"Bu kartı değişecek\" dedin.",
+        "Kuzeninin asker uğurlama videosunu kurguladın.",
+        "Komşunun arabasına park ederken \"Gel gel gel, dur!\" dedin.",
+        "Kapıcı Ahmet abiye ekmekleri dağıtırken yardım ettin.",
+        "Babana kumandanın pillerini değiştirdin, aile seni alkışladı.",
+        "Dolmuşta şoförün yanında oturup bozuk para dağıttın.",
+        "Mangalda közü yelpazeledin, eti başkası yedi.",
+    ],
+    "ru": [
+        "Подержал бутылку воды бригадира на стройке.",
+        "Простоял полдня в очереди в МФЦ за соседа.",
+        "Починил бабушке интернет, выключив и включив роутер.",
+        "Разгрузил «Газель» с картошкой на даче у тёщи.",
+        "Подежурил на лавочке у подъезда вместо бабушек.",
+        "Отработал смену охранником в «Пятёрочке».",
+        "Объяснил деду, как зайти на «Госуслуги». Дважды.",
+        "Продавал семечки у метро.",
+        "Сварил пельмени на всю общагу.",
+        "Собрал шкаф без инструкции. Лишних шурупов осталось семь.",
+        "Покрасил забор в стиле «и так сойдёт».",
+        "Перевёз диван на «девятке». Диван цел, «девятка» - не очень.",
+        "Поработал курьером под дождём, принёс суп ещё горячим.",
+        "Был тамадой на свадьбе двоюродного брата.",
+        "Помог соседу сверху «немного» передвинуть мебель в 2 часа ночи.",
+        "Записался «на минуточку» помочь с ремонтом и остался на три дня.",
+        "Посчитал всю мелочь из копилки для младшего брата.",
+        "Поменял лампочку в подъезде. Весь дом благодарен.",
+    ],
+}
+
+def work_line():
+    lang = _LANG.get()
+    return _RNG.choice(WORK_LINES.get(lang) or WORK_LINES["en"])
+
+@bot.command(name="work")
+@feature_required("economy")
+async def work_p(ctx):
+    gid = ctx.guild.id; econ = get_econ(gid, ctx.author.id)
+    now = datetime.now(timezone.utc); last = econ.get("last_work")
+    if last and (now - datetime.fromisoformat(last)).total_seconds() < 3600:
+        remaining = 3600 - (now - datetime.fromisoformat(last)).total_seconds()
+        await ctx.send(embed=discord.Embed(description=t(gid, "work_wait", f"{int(remaining // 60)}m"), color=0xED4245), delete_after=10)
+        return
+    amount = _RNG.randint(50, 200)
+    econ["wallet"] += amount; econ["last_work"] = now.isoformat(); save_econ()
+    desc = f"💼 {work_line()}\n" + L("💵 **+${:,}** · Wallet: **${:,}**", amount, econ["wallet"])
+    await ctx.send(embed=discord.Embed(description=desc, color=0x57F287))
+
+# ---------- forceban: ban by ID, also people who are not in the server ----------
+@bot.command(name="forceban", aliases=["hackban"])
+@commands.bot_has_permissions(ban_members=True)
+async def forceban_p(ctx, target: str = None, duration: str = None, *, reason: str = "No reason"):
+    gid = ctx.guild.id
+    if not ctx.author.guild_permissions.ban_members:
+        await ctx.send(t(gid, "no_perm"), delete_after=5)
+        return
+    m = re.fullmatch(r"<@!?(\d{15,21})>|(\d{15,21})", (target or "").strip())
+    if not m:
+        await ctx.send(L('❌ Usage: `{}`', '.forceban <user ID> [1d/2h/30m] [reason]'), delete_after=8)
+        return
+    uid = int(m.group(1) or m.group(2))
+    duration, reason, _notify = mod_args(duration, reason, None)        # no DM: we may share no server with them
+    if uid in (ctx.author.id, bot.user.id, ctx.guild.owner_id):
+        await ctx.send(t(gid, "cannot_act"), delete_after=5)
+        return
+    member = ctx.guild.get_member(uid)
+    if member is not None and (not can_act_on(ctx.author, member, ctx.guild) or member.top_role >= ctx.guild.me.top_role):
+        await ctx.send(t(gid, "cannot_act"), delete_after=5)
+        return
+    try:
+        user = await bot.fetch_user(uid)
+    except discord.NotFound:
+        await ctx.send(L("❌ No Discord account has the ID `{}`.", uid), delete_after=8)
+        return
+    except Exception as e:
+        await ctx.send(f"❌ {e}", delete_after=6)
+        return
+    try:
+        await ctx.guild.fetch_ban(user)
+        await ctx.send(L("❌ **{}** is already banned here.", user), delete_after=8)
+        return
+    except discord.NotFound:
+        pass
+    except Exception:
+        pass
+    ban_secs, label = None, L("Permanent")
+    if duration:
+        secs, lbl = parse_duration(duration)
+        if secs:
+            ban_secs, label = secs, lbl
+        else:
+            reason = f"{duration} {reason}".strip()
+    try:
+        await ctx.guild.ban(user, reason=f"{reason} (forceban by {ctx.author})", delete_message_seconds=0)
+    except Exception as e:
+        await ctx.send(f"❌ {e}", delete_after=6)
+        return
+    case_id = next_case_s(get_settings(gid))
+    embed = discord.Embed(color=0xED4245)
+    embed.set_author(name=L('🔨 Banned — {}', user), icon_url=user.display_avatar.url)
+    embed.add_field(name=L('Duration'), value=f"`{label}`", inline=True)
+    embed.add_field(name=L('Reason'), value=reason, inline=False)
+    if member is None:
+        embed.description = L("Banned by ID - this account was not in the server.")
+    embed.set_footer(text=L('Case #{}', case_id))
+    await ctx.send(embed=embed, delete_after=15)
+    try:
+        await ctx.message.add_reaction("✅")
+    except Exception:
+        pass
+    await post_case_log(ctx.guild, case_id, "ban", user, ctx.author, f"[{label}] {reason} (forceban)")
+    if ban_secs:
+        schedule_task("unban", gid, user.id, _time.time() + ban_secs)
+
+# ---------- Higher-Lower: payout from the real chance, ties lose, 3% house edge per guess ----------
+HL_RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]      # ace is high
+HL_EDGE = 0.03
+HL_MAX_MULT = 1000.0          # the game cashes out by itself at x1000
+
+def hl_value(card):
+    return HL_RANKS.index(card[0]) + 2
+
+def hl_odds(card):
+    """{'higher': (chance, multiplier), 'lower': (...)}. Every rank is equally likely on every draw (endless shoe);
+    a tie loses, so the chance already contains it and RTP = chance x multiplier <= 1 - HL_EDGE."""
+    v, out = hl_value(card), {}
+    for side, wins in (("higher", 14 - v), ("lower", v - 2)):
+        p = wins / 13
+        out[side] = (p, math.floor((1 - HL_EDGE) / p * 100) / 100 if p else 0.0)
+    return out
+
+def hl_draw():
+    return (_RNG.choice(HL_RANKS), _RNG.choice(CARD_SUITS))
+
+class HigherLowerView(BaseView):
+    def __init__(self, uid, gid, bet, name, channel=None):
+        super().__init__(timeout=120)
+        self.uid, self.gid, self.bet, self.name, self.channel = uid, gid, bet, name, channel
+        self.card, self.history, self.mult, self.wins = hl_draw(), [], 1.0, 0
+        self.message, self.done, self.lock = None, False, asyncio.Lock()
+        self.refresh_buttons()
+
+    def amount(self):
+        return int(self.bet * self.mult)
+
+    def refresh_buttons(self):
+        odds = hl_odds(self.card)
+        for btn, side, word in ((self.higher, "higher", L("Higher")), (self.lower, "lower", L("Lower"))):
+            p, m = odds[side]
+            btn.label = f"{word} ×{m:.2f}" if p else word
+            btn.disabled = not p
+        self.cashout.label = L("Cash out ${:,}", self.amount())
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if not await super().interaction_check(interaction):
+            return False
+        if interaction.user.id != self.uid:
+            await interaction.response.send_message(L('❌ This is not your game!'), ephemeral=True)
+            return False
+        return True
+
+    async def screen(self, nxt=None, banner=None, tone=None, note=""):
+        """(embed, files) for the current state."""
+        odds = hl_odds(self.card)
+        if self.done:
+            color = 0x57F287 if tone == "win" else 0xED4245
+        else:
+            color = 0xffd700
+        embed = discord.Embed(title=L("🃏 Higher or Lower"), color=color)
+        lines = [note] if note else []
+        if not self.done:
+            lines.append(L("Will the next card be higher or lower? A tie loses."))
+            lines.append(L("Higher: **{}** chance · Lower: **{}** chance", f"{odds['higher'][0]:.0%}", f"{odds['lower'][0]:.0%}"))
+        embed.description = "\n".join(lines)
+        embed.set_footer(text=L("Bet: ${:,}", self.bet) + f" · ×{self.mult:,.2f} · " + L("Correct guesses: {}", self.wins))
+        files = await _fx_attach(embed, "hl.png", render_hl, self.card, nxt, list(self.history), self.mult, f"${self.amount():,}", banner, tone, L("Higher or Lower").upper(), channel=self.channel)
+        if not files:
+            embed.add_field(name=L("Card"), value=card_emoji(self.card) + (f" → {card_emoji(nxt)}" if nxt else ""), inline=True)
+            embed.add_field(name=L("Win"), value=f"${self.amount():,} (×{self.mult:,.2f})", inline=True)
+        return embed, files
+
+    async def finish(self, cashed):
+        self.done = True
+        self.stop()
+        if active_bj.get(self.uid) is self:
+            active_bj.pop(self.uid, None)
+        if cashed:
+            econ = get_econ(self.gid, self.uid)
+            econ["wallet"] += self.amount()
+            save_econ()
+
+    async def guess(self, interaction, side):
+        await interaction.response.defer()
+        async with self.lock:
+            if self.done:
+                return
+            p, m = hl_odds(self.card)[side]
+            if not p:
+                return
+            nxt = hl_draw()
+            won = hl_value(nxt) > hl_value(self.card) if side == "higher" else hl_value(nxt) < hl_value(self.card)
+            word = L("Higher") if side == "higher" else L("Lower")
+            if not won:
+                await self.finish(cashed=False)
+                embed, files = await self.screen(nxt, banner=L("LOST"), tone="lose",
+                                                 note=L("❌ **{}** was wrong - the card was {}. You lost **${:,}**.", word, card_emoji(nxt), self.bet))
+                await interaction.edit_original_response(embed=embed, attachments=files, view=None)
+                return
+            self.history.append(self.card)
+            self.card, self.mult, self.wins = nxt, self.mult * m, self.wins + 1
+            if self.mult >= HL_MAX_MULT:
+                await self.finish(cashed=True)
+                embed, files = await self.screen(None, banner=L("MAX WIN"), tone="win", note=L("🏆 Maximum reached - auto cash out: **+${:,}**", self.amount()))
+                await interaction.edit_original_response(embed=embed, attachments=files, view=None)
+                return
+            self.refresh_buttons()
+            embed, files = await self.screen(note=L("✅ **{}** - correct! Cash out or keep going.", word))
+            await interaction.edit_original_response(embed=embed, attachments=files, view=self)
+
+    @discord.ui.button(label="Higher", emoji="⬆️", style=discord.ButtonStyle.green)
+    async def higher(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.guess(interaction, "higher")
+
+    @discord.ui.button(label="Lower", emoji="⬇️", style=discord.ButtonStyle.red)
+    async def lower(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.guess(interaction, "lower")
+
+    @discord.ui.button(label="Cash out", emoji="💰", style=discord.ButtonStyle.blurple)
+    async def cashout(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        async with self.lock:
+            if self.done:
+                return
+            await self.finish(cashed=True)
+            embed, files = await self.screen(banner=L("CASHED OUT"), tone="win", note=L("💰 Cashed out **${:,}** (×{:,.2f}).", self.amount(), self.mult))
+            await interaction.edit_original_response(embed=embed, attachments=files, view=None)
+
+    async def on_timeout(self):
+        async with self.lock:
+            if self.done:
+                return
+            await self.finish(cashed=True)              # idle: the current amount is paid out, nothing is lost
+            if self.message:
+                try:
+                    embed, files = await self.screen(banner=L("CASHED OUT"), tone="win", note=L("⏰ Time is up - auto cash out: **${:,}**.", self.amount()))
+                    await self.message.edit(embed=embed, attachments=files, view=None)
+                except Exception:
+                    pass
+
+@bot.command(name="higherlower", aliases=["hl"])
+@feature_required("casino")
+async def hl_p(ctx, bet: str = None):
+    gid = ctx.guild.id
+    if not await check_casino(ctx, is_slash=False):
+        return
+    econ = get_econ(gid, ctx.author.id)
+    amount = parse_amount(bet, econ["wallet"])
+    if amount is None or amount <= 0:
+        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
+        return
+    if ctx.author.id in active_bj:
+        await ctx.send(L("❌ You already have a card game running!"), delete_after=5)
+        return
+    if amount > econ["wallet"]:
+        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
+        return
+    econ["wallet"] -= amount
+    save_econ()
+    view = HigherLowerView(ctx.author.id, gid, amount, ctx.author.display_name, channel=ctx.channel)
+    active_bj[ctx.author.id] = view
+    embed, files = await view.screen()
+    view.message = await ctx.send(embed=embed, files=files, view=view)
+
+# ---------- blackjack: 1 to 4 players at one table, own drawn cards ----------
+BJ_MAX_PLAYERS = 4
+BJ_TURN_SECONDS = 45
+BJ_INVITE_SECONDS = 60
+
+def bj_dealer_play(dealer, draw):
+    while hand_value(dealer) < 17:
+        dealer.append(draw())
+    return dealer
+
+def bj_credit(state, pv, dv, bet):
+    """Coins that go back to the wallet (stake included). state: 'bust' | 'bj' (natural) | 'stand'."""
+    if state == "bust" or pv > 21:
+        return 0
+    if state == "bj":
+        return int(bet * 2.5)
+    if dv > 21 or pv > dv:
+        return bet * 2
+    if pv == dv:
+        return bet
+    return 0
+
+def bj_shoe(players):
+    deck = [(v, s) for s in CARD_SUITS for v in HL_RANKS] * (1 if players <= 1 else 2)
+    _RNG.shuffle(deck)
+    return deck
+
+class BlackjackTable(BaseView):
+    def __init__(self, gid, members, bet):
+        super().__init__(timeout=900)
+        self.gid, self.message, self.lock, self.finished, self.moves, self._timer, self.channel = gid, None, asyncio.Lock(), False, 0, None, None
+        self.deck = bj_shoe(len(members))
+        self.seats = [{"id": m.id, "name": m.display_name, "hand": [], "bet": bet, "state": "play", "credit": 0, "afk": False} for m in members]
+        self.dealer = []
+        for s in self.seats:
+            s["hand"] = [self.draw(), self.draw()]
+            if hand_value(s["hand"]) == 21:
+                s["state"] = "bj"
+        self.dealer = [self.draw(), self.draw()]
+        self.turn = -1
+        self.advance()
+
+    def draw(self):
+        if not self.deck:
+            self.deck = bj_shoe(len(self.seats))
+        return self.deck.pop()
+
+    def current(self):
+        return self.seats[self.turn] if 0 <= self.turn < len(self.seats) else None
+
+    def advance(self):
+        self.turn = next((i for i in range(self.turn + 1, len(self.seats)) if self.seats[i]["state"] == "play"), len(self.seats))
+        self.moves += 1
+        cur = self.current()
+        if cur:
+            self.double.disabled = len(cur["hand"]) != 2 or get_econ(self.gid, cur["id"])["wallet"] < cur["bet"]
+
+    def settle(self):
+        if any(s["state"] != "bust" for s in self.seats):
+            bj_dealer_play(self.dealer, self.draw)
+        dv = hand_value(self.dealer)
+        for s in self.seats:
+            s["credit"] = bj_credit(s["state"], hand_value(s["hand"]), dv, s["bet"])
+            if s["credit"]:
+                get_econ(self.gid, s["id"])["wallet"] += s["credit"]
+        save_econ()
+        self.finished = True
+        self.stop()
+        if self._timer and self._timer is not asyncio.current_task():
+            self._timer.cancel()
+        for s in self.seats:
+            if active_bj.get(s["id"]) is self:
+                active_bj.pop(s["id"], None)
+
+    def _seat_line(self, s):
+        pv, cur = hand_value(s["hand"]), self.current()
+        if self.finished:
+            delta = s["credit"] - s["bet"]
+            if s["state"] == "bust":
+                return L("❌ **{}** busted: **-${:,}**", s["name"], s["bet"]), "lose"
+            if delta > 0:
+                return (L("🎉 **{}** - Blackjack! **+${:,}**", s["name"], delta) if s["state"] == "bj" else L("✅ **{}** wins **+${:,}**", s["name"], delta)), "win"
+            if delta == 0:
+                return L("🤝 **{}** - push, bet returned", s["name"]), "push"
+            return L("❌ **{}** loses **-${:,}**", s["name"], s["bet"]), "lose"
+        if s is cur:
+            return L("👉 **{}** is playing ({}s)", s["name"], BJ_TURN_SECONDS), None
+        tags = {"bj": L("Blackjack!"), "bust": L("Bust"), "stand": L("Stand"), "play": L("Waiting")}
+        return f"**{s['name']}** - {tags.get(s['state'], '')}" + (" ⏰" if s["afk"] else ""), None
+
+    async def screen(self):
+        cur = self.current()
+        reveal = self.finished
+        color = 0x1a1a1a if not reveal else 0x57F287 if any(s["credit"] > s["bet"] for s in self.seats) else 0xED4245
+        title = L("🃏 Blackjack") + (" · " + L("{} players", len(self.seats)) if len(self.seats) > 1 else "")
+        embed = discord.Embed(title=title, color=color)
+        lines, seats = [], []
+        for s in self.seats:
+            line, tone = self._seat_line(s)
+            lines.append(line)
+            if reveal:
+                delta = s["credit"] - s["bet"]
+                tag = L("Bust") if s["state"] == "bust" else f"+${delta:,}" if delta > 0 else L("Push") if delta == 0 else f"-${s['bet']:,}"
+                if s["state"] == "bj":
+                    tag = L("Blackjack!") + " " + tag
+            else:
+                tag = {"bj": L("Blackjack!"), "bust": L("Bust"), "stand": L("Stand")}.get(s["state"], "")
+            tag = tag.upper()
+            seats.append({"name": s["name"], "hand": s["hand"], "value": hand_value(s["hand"]), "tag": tag, "turn": s is cur and not reveal, "tone": tone})
+        if reveal:
+            lines.append(L("Dealer: **{}**", hand_value(self.dealer)) + (" - " + L("Bust") if hand_value(self.dealer) > 21 else ""))
+        embed.description = "\n".join(lines)
+        embed.set_footer(text=L('Bet: ${:,}', self.seats[0]["bet"]) if len(self.seats) == 1 else L("Bet per player: ${:,}", self.seats[0]["bet"]))
+        files = await _fx_attach(embed, "bj.png", render_bj_table, list(self.dealer), not reveal, seats, {"dealer": L("Dealer")}, channel=self.channel)
+        if not files:
+            dealer = " ".join(card_emoji(c) for c in self.dealer) if reveal else card_emoji(self.dealer[0]) + " 🂠"
+            embed.add_field(name=L('Dealer hand ({})', hand_value(self.dealer)) if reveal else L('Dealer hand (?)'), value=dealer, inline=False)
+            for s in self.seats:
+                embed.add_field(name=f"{s['name']} ({hand_value(s['hand'])})", value=" ".join(card_emoji(c) for c in s["hand"]), inline=True)
+        return embed, files
+
+    def _arm_timer(self):
+        if self._timer and self._timer is not asyncio.current_task():
+            self._timer.cancel()
+        if not self.finished and self.current():
+            self._timer = asyncio.create_task(self._turn_timeout(self.moves))
+
+    async def _turn_timeout(self, moves):
+        try:
+            await asyncio.sleep(BJ_TURN_SECONDS)
+        except asyncio.CancelledError:
+            return
+        async with self.lock:
+            if self.finished or self.moves != moves or not self.current():
+                return
+            seat = self.current()
+            seat["state"], seat["afk"] = "stand", True            # an idle player stands; the others keep playing
+            self.advance()
+            if not self.current():
+                self.settle()
+            await self.publish()
+
+    async def publish(self, interaction=None):
+        embed, files = await self.screen()
+        view = None if self.finished else self
+        try:
+            if interaction is not None:
+                await interaction.edit_original_response(embed=embed, attachments=files, view=view)
+            elif self.message:
+                await self.message.edit(embed=embed, attachments=files, view=view)
+        except Exception:
+            pass
+        self._arm_timer()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if not await super().interaction_check(interaction):
+            return False
+        cur = self.current()
+        if cur is None or interaction.user.id != cur["id"]:
+            mine = any(s["id"] == interaction.user.id for s in self.seats)
+            await interaction.response.send_message(L("⏳ It is not your turn!") if mine else L('❌ This is not your game!'), ephemeral=True)
+            return False
+        return True
+
+    async def act(self, interaction, action):
+        await interaction.response.defer()
+        async with self.lock:
+            seat = self.current()
+            if self.finished or seat is None or seat["id"] != interaction.user.id:
+                return
+            if action == "double":
+                econ = get_econ(self.gid, seat["id"])
+                if len(seat["hand"]) != 2 or econ["wallet"] < seat["bet"]:
+                    await interaction.followup.send(L('❌ You can only double on your first move and with enough money!'), ephemeral=True)
+                    return
+                econ["wallet"] -= seat["bet"]
+                seat["bet"] *= 2
+                save_econ()
+            if action in ("hit", "double"):
+                seat["hand"].append(self.draw())
+            pv = hand_value(seat["hand"])
+            if pv > 21:
+                seat["state"] = "bust"
+            elif action in ("stand", "double") or pv == 21:
+                seat["state"] = "stand"
+            if seat["state"] != "play":
+                self.advance()
+            else:
+                self.moves += 1
+                self.double.disabled = True
+            if not self.current():
+                self.settle()
+            await self.publish(interaction)
+
+    @discord.ui.button(label="Hit", emoji="👆", style=discord.ButtonStyle.green)
+    async def hit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.act(interaction, "hit")
+
+    @discord.ui.button(label="Stand", emoji="✋", style=discord.ButtonStyle.red)
+    async def stand(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.act(interaction, "stand")
+
+    @discord.ui.button(label="Double", emoji="✌️", style=discord.ButtonStyle.blurple)
+    async def double(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.act(interaction, "double")
+
+    async def on_timeout(self):
+        async with self.lock:
+            if self.finished:
+                return
+            for s in self.seats:
+                if s["state"] == "play":
+                    s["state"], s["afk"] = "stand", True
+            self.turn = len(self.seats)
+            self.settle()
+            await self.publish()
+
+async def start_bj_table(gid, members, bet, send=None, message=None, channel=None):
+    """Seats are paid already. Deals, then sends (or edits the invite message into) the table."""
+    table = BlackjackTable(gid, members, bet)
+    table.channel = channel or getattr(message, "channel", None)
+    for m in members:
+        active_bj[m.id] = table
+    if not table.current():
+        table.settle()
+    embed, files = await table.screen()
+    view = None if table.finished else table
+    if message is not None:
+        await message.edit(content=None, embed=embed, attachments=files, view=view)
+        table.message = message
+    else:
+        table.message = await send(embed=embed, files=files, view=view)
+    table._arm_timer()
+    return table
+
+class BlackjackInvite(BaseView):
+    def __init__(self, gid, host, invited, bet):
+        super().__init__(timeout=BJ_INVITE_SECONDS)
+        self.gid, self.host, self.invited, self.bet = gid, host, invited, bet
+        self.accepted, self.declined, self.message, self.closed, self.lock = [], [], None, False, asyncio.Lock()
+
+    def embed(self):
+        ids = {m.id for m in self.accepted}
+        nope = {m.id for m in self.declined}
+        rows = [f"{'✅' if m.id in ids else '❌' if m.id in nope else '⏳'} {m.mention}" for m in self.invited]
+        e = discord.Embed(title=L("🃏 Blackjack table"), color=0xffd700,
+                          description=L("{} invites you to blackjack. Bet: **${:,}** each.\nPress **Accept** within {} seconds.", self.host.mention, self.bet, BJ_INVITE_SECONDS) + "\n\n" + "\n".join(rows))
+        e.set_footer(text=L("Players take turns - only the player whose turn it is can press the buttons."))
+        return e
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if not await super().interaction_check(interaction):
+            return False
+        if interaction.user.id != self.host.id and interaction.user.id not in {m.id for m in self.invited}:
+            await interaction.response.send_message(L("❌ This invitation is not for you."), ephemeral=True)
+            return False
+        return True
+
+    def _refund_all(self):
+        for m in [self.host] + self.accepted:
+            get_econ(self.gid, m.id)["wallet"] += self.bet
+            if isinstance(active_bj.get(m.id), BlackjackInvite):
+                active_bj.pop(m.id, None)
+        save_econ()
+
+    async def _maybe_start(self, interaction=None):
+        if len(self.accepted) + len(self.declined) < len(self.invited):
+            if interaction is not None:
+                await interaction.response.edit_message(embed=self.embed(), view=self)
+            return
+        await self._close(interaction)
+
+    async def _close(self, interaction=None):
+        """Everyone answered or time is up: start with whoever accepted, otherwise cancel and refund."""
+        self.closed = True
+        self.stop()
+        if interaction is not None:
+            await interaction.response.defer()
+        if not self.accepted:
+            self._refund_all()
+            await self.message.edit(content=None, embed=discord.Embed(description=L("🃏 Nobody accepted - the table is closed and the bet was returned."), color=0x808080), view=None)
+            return
+        members = [self.host] + [m for m in self.invited if m in self.accepted]
+        await start_bj_table(self.gid, members, self.bet, message=self.message)
+
+    @discord.ui.button(label="Accept", emoji="✅", style=discord.ButtonStyle.green)
+    async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        async with self.lock:
+            user = interaction.user
+            if self.closed or user.id == self.host.id or user in self.accepted or user in self.declined:
+                await interaction.response.send_message(L("❌ You already answered."), ephemeral=True)
+                return
+            if user_restricted(user.id, "casino"):
+                await interaction.response.send_message(restricted_text("casino"), ephemeral=True)
+                return
+            if user.id in active_bj:
+                await interaction.response.send_message(L("❌ You already have a card game running!"), ephemeral=True)
+                return
+            econ = get_econ(self.gid, user.id)
+            if econ["wallet"] < self.bet:
+                await interaction.response.send_message(t(self.gid, "not_enough_wallet", f"{econ['wallet']:,}"), ephemeral=True)
+                return
+            econ["wallet"] -= self.bet
+            save_econ()
+            active_bj[user.id] = self
+            self.accepted.append(next(m for m in self.invited if m.id == user.id))
+            await self._maybe_start(interaction)
+
+    @discord.ui.button(label="Decline", emoji="✖️", style=discord.ButtonStyle.grey)
+    async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
+        async with self.lock:
+            user = interaction.user
+            if self.closed or user.id == self.host.id or user in self.accepted or user in self.declined:
+                await interaction.response.send_message(L("❌ You already answered."), ephemeral=True)
+                return
+            self.declined.append(next(m for m in self.invited if m.id == user.id))
+            await self._maybe_start(interaction)
+
+    @discord.ui.button(label="Start now", emoji="▶️", style=discord.ButtonStyle.blurple)
+    async def start_now(self, interaction: discord.Interaction, button: discord.ui.Button):
+        async with self.lock:
+            if interaction.user.id != self.host.id:
+                await interaction.response.send_message(L("❌ Only {} can do this.", self.host.display_name), ephemeral=True)
+                return
+            if self.closed:
+                return
+            if not self.accepted:
+                self._refund_all()
+                self.closed = True
+                self.stop()
+                await interaction.response.edit_message(content=None, embed=discord.Embed(description=L("🃏 The table was cancelled and the bet was returned."), color=0x808080), view=None)
+                return
+            await self._close(interaction)
+
+    async def on_timeout(self):
+        async with self.lock:
+            if not self.closed:
+                try:
+                    await self._close()
+                except Exception:
+                    pass
+
+@bot.command(name="blackjack", aliases=["bj"])
+@feature_required("casino")
+async def bj_p(ctx, *, bet: str = None):
+    """.bj <bet>  or  .bj @a @b @c <bet>  (up to 4 players including you)."""
+    gid = ctx.guild.id
+    if not await check_casino(ctx, is_slash=False):
+        return
+    ids, rest = [], []
+    for tok in (bet or "").split():
+        m = re.fullmatch(r"<@!?(\d+)>", tok)
+        if m:
+            if int(m.group(1)) not in ids:
+                ids.append(int(m.group(1)))
+        else:
+            rest.append(tok)
+    econ = get_econ(gid, ctx.author.id)
+    amount = parse_amount(rest[0] if len(rest) == 1 else None, econ["wallet"])
+    if amount is None or amount <= 0:
+        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}") + "\n" + L("Usage: `{}`", ".bj <bet>  ·  .bj @user1 @user2 <bet>"), delete_after=10)
+        return
+    invited = [ctx.guild.get_member(i) for i in ids if i != ctx.author.id]
+    if any(m is None or m.bot for m in invited) or len(invited) > BJ_MAX_PLAYERS - 1:
+        await ctx.send(L("❌ You can invite up to {} members (no bots).", BJ_MAX_PLAYERS - 1), delete_after=8)
+        return
+    if ctx.author.id in active_bj:
+        await ctx.send(L("❌ You already have a card game running!"), delete_after=5)
+        return
+    busy = [m.display_name for m in invited if m.id in active_bj]
+    if busy:
+        await ctx.send(L("❌ Already in a card game: {}", ", ".join(busy)), delete_after=8)
+        return
+    if amount > econ["wallet"]:
+        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
+        return
+    econ["wallet"] -= amount
+    save_econ()
+    if not invited:
+        await start_bj_table(gid, [ctx.author], amount, send=ctx.send, channel=ctx.channel)
+        return
+    invite = BlackjackInvite(gid, ctx.author, invited, amount)
+    active_bj[ctx.author.id] = invite
+    invite.message = await ctx.send(content=" ".join(m.mention for m in invited), embed=invite.embed(), view=invite,
+                                    allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
+
+# ---------- animated slots + coin flip (falls back to the plain embed without Pillow) ----------
+@bot.command(name="slots")
+@feature_required("casino")
+async def slots_p(ctx, bet: str = None):
+    gid = ctx.guild.id
+    if not await check_casino(ctx, is_slash=False):
+        return
+    econ = get_econ(gid, ctx.author.id)
+    if bet is None:
+        embed = discord.Embed(title=L("🎰 Slots Paytable"), color=0xffd700,
+                              description=slots_paytable() + "\n\n" + L("Three of a kind pays the big number, two of a kind the small one. 🍀 pays nothing."))
+        embed.set_footer(text=L("Play: .slots <bet> · Wallet: ${:,}", econ["wallet"]))
+        await ctx.send(embed=embed)
+        return
+    amount = parse_amount(bet, econ["wallet"])
+    if amount is None or amount <= 0:
+        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
+        return
+    bet = amount
+    if bet > econ["wallet"]:
+        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
+        return
+    econ["wallet"] -= bet
+    reels, mult, kind = slot_spin()
+    payout = int(bet * mult)
+    econ["wallet"] += payout
+    save_econ()
+    display = " | ".join(reels)
+    sym = next((e for e in reels if reels.count(e) >= 2), "")
+    if kind == "jackpot":
+        desc, color = L("🎰 {}\n\n💥 **JACKPOT!** x{:g} → **${:,}**!", display, mult, payout), 0xffd700
+    elif kind == "triple":
+        desc, color = L("🎰 {}\n\n🎉 **Three {}!** x{:g} → **${:,}**", display, sym, mult, payout), 0x57F287
+    elif kind == "pair" and mult > 1:
+        desc, color = L("🎰 {}\n\n✅ Two {}! x{:g} → **${:,}**", display, sym, mult, payout), 0x57F287
+    elif kind == "pair":
+        desc, color = L("🎰 {}\n\n🤝 Two {}! Your bet is returned.", display, sym), 0xFEE75C
+    else:
+        desc, color = L("🎰 {}\n\n❌ No match. -${:,}", display, bet), 0xED4245
+    try:
+        if not _can_attach(ctx.channel):
+            raise RuntimeError("no Attach Files permission here")
+        gif, png, secs = await fx_run(render_slots, reels, mult, kind, timeout=8.0)
+    except Exception:
+        await ctx.send(embed=discord.Embed(description=desc, color=color))
+        return
+    spin = discord.Embed(title=L("🎰 Slots"), description=L("Spinning... bet **${:,}**", bet), color=0x2b2d31)
+    spin.set_image(url="attachment://slots.gif")
+    msg = await ctx.send(embed=spin, file=discord.File(io.BytesIO(gif), filename="slots.gif"))
+    await asyncio.sleep(secs + 0.2)
+    final = discord.Embed(title=L("🎰 Slots"), description=desc.split("\n\n", 1)[-1], color=color)
+    final.set_image(url="attachment://slots.png")
+    try:
+        await msg.edit(embed=final, attachments=[discord.File(io.BytesIO(png), filename="slots.png")])
+    except Exception:
+        pass
+
+@bot.command(name="coinflip", aliases=["cf"])
+@feature_required("casino")
+async def cf_p(ctx, bet: str = None, choice: str = None):
+    gid = ctx.guild.id
+    if not await check_casino(ctx, is_slash=False):
+        return
+    picks = {"heads": "heads", "head": "heads", "h": "heads", "tails": "tails", "tail": "tails", "t": "tails"}
+    if bet and bet.lower() in picks and choice and choice.lower() not in picks:      # "cf heads 30%" works too
+        bet, choice = choice, bet
+    pick = picks.get((choice or "").lower())
+    if bet is None or not pick:
+        await ctx.send(L("❌ Usage: `{}`", ".cf <bet|all|half|25%> heads/tails"), delete_after=6)
+        return
+    econ = get_econ(gid, ctx.author.id)
+    amount = parse_amount(bet, econ["wallet"])
+    if amount is None or amount <= 0:
+        await ctx.send(t(gid, "invalid_bet", f"{econ['wallet']:,}"), delete_after=8)
+        return
+    bet = amount
+    if bet > econ["wallet"]:
+        await ctx.send(embed=discord.Embed(description=t(gid, "not_enough_wallet", f"{econ['wallet']:,}"), color=0xED4245))
+        return
+    result = "heads" if _RNG.getrandbits(1) == 0 else "tails"
+    won = result == pick
+    econ["wallet"] += bet if won else -bet
+    save_econ()
+    face = L("Heads") if result == "heads" else L("Tails")
+    if won:
+        desc = L("🪙 **{}**!\n✅ You won **+${:,}**!", face, bet)
+    else:
+        desc = L("🪙 **{}**!\n❌ You lost **-${:,}**!", face, bet)
+    try:
+        if not _can_attach(ctx.channel):
+            raise RuntimeError("no Attach Files permission here")
+        gif, png, secs = await fx_run(render_coin, result, won, face, timeout=6.0)
+    except Exception:
+        await ctx.send(embed=discord.Embed(description=desc, color=0x57F287 if won else 0xED4245))
+        return
+    toss = discord.Embed(title=L("🪙 Coinflip"), description=L("Flipping... **{}** for **${:,}**", L("Heads") if pick == "heads" else L("Tails"), bet), color=0x2b2d31)
+    toss.set_image(url="attachment://coin.gif")
+    msg = await ctx.send(embed=toss, file=discord.File(io.BytesIO(gif), filename="coin.gif"))
+    await asyncio.sleep(secs + 0.2)
+    final = discord.Embed(title=L("🪙 Coinflip"), description=desc, color=0x57F287 if won else 0xED4245)
+    final.set_image(url="attachment://coin.png")
+    try:
+        await msg.edit(embed=final, attachments=[discord.File(io.BytesIO(png), filename="coin.png")])
+    except Exception:
+        pass
 
 # ============================================================
 # EVENTS

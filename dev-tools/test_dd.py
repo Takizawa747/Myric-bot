@@ -1,5 +1,5 @@
 import ast, os, json, sqlite3, threading, time as _time, tempfile
-BOT = __import__("os").environ.get("BOT_SRC", "/mnt/user-data/outputs/bot.py")
+BOT = __import__("os").environ.get("BOT_SRC", __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py"))
 def block(first, last):
     """Source of the contiguous top-level block first..last, taken from the real bot.py (never from stale copies)."""
     src = open(BOT, encoding="utf-8").read(); tree = ast.parse(src)

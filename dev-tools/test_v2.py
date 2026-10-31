@@ -1,5 +1,5 @@
 import ast, asyncio, re, sys, types
-BOT = __import__("os").environ.get("BOT_SRC", "/mnt/user-data/outputs/bot.py"); SRC = open(BOT, encoding="utf-8").read(); TREE = ast.parse(SRC)
+BOT = __import__("os").environ.get("BOT_SRC", __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py")); SRC = open(BOT, encoding="utf-8").read(); TREE = ast.parse(SRC)
 def nm(n):
     if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return n.name
     if isinstance(n, ast.Assign):
@@ -16,7 +16,7 @@ check(not re.search(r"is_owner\((?:ctx\.author|interaction\.user)\.id\)", SRC), 
 check("create_invite" not in SRC and "fetch_user(BOT_CREATOR_ID)" not in seg("on_guild_join"), "joining a server messages nobody and makes no invite")
 check("channel.edit(overwrites" not in SRC and "ch.edit(overwrites" not in SRC, "channel permissions are changed per target (needs only Manage Roles)")
 lock_src = seg("lock_p", "unlock_p"); check("manage_roles" in lock_src and "manage_channels" not in lock_src, "lock / unlock need Manage Roles, not Manage Channels")
-need = {"ban": "ban_members", "unban": "ban_members", "softban": "ban_members", "kick": "kick_members", "mute": "manage_roles", "unmute": "manage_roles", "timeout": "moderate_members", "untimeout": "moderate_members",
+need = {"ban": "ban_members", "forceban": "ban_members", "unban": "ban_members", "softban": "ban_members", "kick": "kick_members", "mute": "manage_roles", "unmute": "manage_roles", "timeout": "moderate_members", "untimeout": "moderate_members",
         "purge": "manage_messages", "nick": "manage_nicknames", "slowmode": "manage_channels", "lock": "manage_roles", "unlock": "manage_roles", "massrole": "manage_roles", "resetchannel": "manage_channels"}
 got = {}
 for node in TREE.body:

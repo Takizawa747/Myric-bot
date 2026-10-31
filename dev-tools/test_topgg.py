@@ -1,6 +1,6 @@
 import ast, asyncio, re, sys, types
 from datetime import datetime, timezone
-BOT = __import__("os").environ.get("BOT_SRC", "/mnt/user-data/outputs/bot.py"); SRC = open(BOT, encoding="utf-8").read(); TREE = ast.parse(SRC)
+BOT = __import__("os").environ.get("BOT_SRC", __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py")); SRC = open(BOT, encoding="utf-8").read(); TREE = ast.parse(SRC)
 def nm(n):
     if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return n.name
     if isinstance(n, ast.Assign):

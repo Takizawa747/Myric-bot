@@ -36,10 +36,12 @@ Features: moderation (ban/kick/softban/mute/timeout/warn/purge/nick/slowmode/loc
 
 ---
 
-## 3. Current state (31 Oct 2026)
+## 3. Current state (31 Oct 2026, after V3)
 
-- `bot.py` ≈ **7,304 lines**, all **9 test suites green**, static check 0 errors, all ~400 `L()` phrases translated TR/RU.
-- **Not yet tested on live Discord** for the latest rounds (ticket editor fix, `/ticket add`, log panel, DM policy, exact permissions). First live run is the real test.
+- Code lives in GitHub now (`bot.py`, `dev-tools/`, `fx/`); work branch `claude/new-session-k2c61b`.
+- `bot.py` ≈ **8,650 lines**, all **10 test suites green** (new: `test_v3`), static check 0 errors, all 495 `L()` templates translated TR/RU, `--check` OK.
+- **Needs discord.py ≥ 2.6** (store/inventory use Components V2 `LayoutView`); older versions stop with a clear "pip install -U discord.py" message.
+- **Not yet tested on live Discord**: V2 round (ticket editor fix, `/ticket add`, log panel, DM policy, exact permissions) and the whole V3 round (below). First live run is the real test.
 - Token was removed from code. Bot refuses to start without `token.txt` (or env `VERSA_TOKEN`). `--check` works without a token.
 
 ---
@@ -56,7 +58,7 @@ cd ~/mybot && python3 bot.py --check        # prints prefix/slash counts, no Dis
 - Working SSH key was recovered as `~/storage/shared/ssh-key-2026-09-05.key` (the same-named file in Downloads is a DIFFERENT key).
 - Runs in `screen` today. `versa.service` (systemd, `Restart=always`) is prepared — recommend switching; before that `pkill -f "python3 bot.py"; screen -wipe` or two bots run (this happened once: duplicate replies).
 - Token: `read -s T && printf '%s' "$T" > token.txt && chmod 600 token.txt; unset T` (never `echo` it). The old token leaked into chats → must be **reset** in the Developer Portal if not done yet.
-- Deps: `pip install -U discord.py Pillow --break-system-packages`. (PyNaCl on Termux ARM needed `SODIUM_INSTALL=system`; not needed now — no voice playback.)
+- Deps: `pip install -U discord.py Pillow --break-system-packages` (discord.py must be ≥ 2.6; Pillow is optional - without it games fall back to text). (PyNaCl on Termux ARM needed `SODIUM_INSTALL=system`; not needed now — no voice playback.)
 - GitHub blocks pushes containing tokens — never put the token in any file.
 
 ---
@@ -75,6 +77,9 @@ cd ~/mybot && python3 bot.py --check        # prints prefix/slash counts, no Dis
 - **Owner tools are DM-only** (`handle_owner_dm`, `DM_COMMANDS`): banuser (menu: full ban or per-feature restriction), unbanuser, bannedusers, banserver/unbanserver/bannedservers/leaveserver/servers, add/remove/set/resetmoney, add/remove/set/resetlevel, addxp/removexp, saydm, sayin, supsearch, supstats, userdata, stealemoji, setstatus, backup, whitelist. Whitelist groups: bans, money, levels, messaging, info, all. Moderation is never whitelistable.
 - **deletedata** (DM, anyone): 14 categories of a user's own data; moderation records never deletable.
 - **Help:** dropdown categories + "📋 All commands" page built live from the command tables (can't go stale).
+- **FX engine (in bot.py, from `fx/blk_fx1.py`):** `FX_OK` (Pillow optional), `fx_run()` (worker thread, max 2 at once, timeout), `_Cv` canvas. Renderers: `render_slots` (GIF), `render_coin` (GIF), `render_bj_table` / `render_hl` (PNG, own drawn cards: suits are polygons, Versa card back). `_fx_attach()` returns `[]` when Pillow is missing, the channel denies Attach Files (`_can_attach`) or rendering fails → callers show the text version.
+- **Card games:** `active_bj[user_id]` holds ANY running card game (blackjack table, blackjack invite, higher-lower) → one at a time per user; deletedata "games" clears it.
+- **Store/inventory UI:** `StoreLayout` / `InventoryLayout` (`BaseLayout` = LayoutView with BaseView's checks), 6 items per page (Discord max 40 components/message), `buy_store_item()` / `use_store_item()` shared by buttons and `.buy`.
 
 ### Policies decided with Brad
 - **No DMs unless asked.** `send_dm()` sends only if the moderator adds `-dm` to the command, the server enabled "📨 Moderation DMs" feature, or the owner ticks "Notify by DM" in the banuser menu. `/dms off` always wins.
@@ -100,18 +105,21 @@ cd ~/mybot && python3 bot.py --check        # prints prefix/slash counts, no Dis
 
 ## 7. OPEN WORK — do these next (Brad's latest requests, in his words summarised)
 
-1. **Custom visuals everywhere, no stock emoji/GIFs.** Brad finds default Unicode emojis unprofessional. Wants Versa's own emoji set (wallet, bank, coin, money, cards, slots symbols, mod actions, tickets, etc.) and animations:
+Status after V3: **done** = 3 (store/inv buttons), 4 (.work per language), 6 (forceban); 2 partly (Higher-Lower + multiplayer blackjack done, one more game left); 1 partly (cards, slots GIF, coin GIF are in; banners/rank/level-up/leaderboard cards and the application-emoji set are not).
+
+1. **Custom visuals everywhere, no stock emoji/GIFs.** *(V3: blackjack + higher-lower use own drawn cards (PNG per action), `.slots` / `.cf` send the approved GIF then edit to the final frame. Still to do: integrate `fx/blk_fx2.py` (mod banners, rank, level-up, leaderboard cards), draw the sprite set + application emojis + `EMO` map. Buttons keep their emoji in the `emoji=` argument so they can be swapped to `EMO[...]` later.)* Brad finds default Unicode emojis unprofessional. Wants Versa's own emoji set (wallet, bank, coin, money, cards, slots symbols, mod actions, tickets, etc.) and animations:
    - Prototypes exist in `fx/` (`blk_fx1.py`: optional-Pillow engine, `fx_run` thread pool, animated **slot machine GIF** with own drawn symbols, **coin flip GIF**; `blk_fx2.py`: animated **moderation banners** (ban/kick/timeout/mute/warn/pardon), **rank card**, **level-up card**, **leaderboard card**). Previews were approved in chat. **Not yet integrated into bot.py.** Slot symbol "777 machine" was drawn by us, but Brad wants every symbol fully ours (no emoji-like look).
    - Plan: draw a sprite set (PNG 128 px) → upload as **application emojis** (Developer Portal → Emojis, up to 2,000, usable in any server without Use External Emojis) → central `EMO = {...}` map → replace Unicode emojis in embeds/buttons. Keep a Unicode fallback if an emoji ID is missing.
    - **Blackjack: own drawn cards** (render the table as an image per action) instead of the card emojis.
-2. **Casino additions:**
+2. **Casino additions:** *(V3 done: `.hl` and `.bj @a @b <bet>`. Left: one more game.)*
    - **Higher-Lower** `.hl <bet>`: show a card, buttons Higher / Lower (and cash-out between rounds). Payout from real probability with house edge: e.g. card 3 → "lower" is unlikely → big multiplier; "higher" is likely → tiny multiplier (well under 2x). Formula: `mult = (1 - edge) / P(win)`, ties lose or push (decide, document).
    - **Multiplayer blackjack:** `.bj @u1 @u2 @u3 <bet>` (up to 4 players incl. host; 1-player still works). Invite embed with Accept/Decline buttons, starts when all invited accept (timeout → start with those who accepted or cancel), everyone pays the bet, turns go player by player — only the current player can press Hit/Stand/Double; then dealer plays.
    - At least one more game (ideas: roulette, crash, mines, dice). All with own visuals.
-3. **Store/inventory buttons:** `.estore` shows items with a **Buy button under each item**. **Delete `useitem` command**; `.inv` shows items with quantity and a **Use button** under each owned item. Update help, tests, translations.
-4. **`.work` creative per language:** random funny jobs, different joke sets per language (TR memes for Turkish servers, EN memes for English, RU for Russian — e.g. "held the master's water bottle at the construction site" style). Not just translations — culturally different lines.
+   - **As built:** Higher-Lower: every rank equally likely on each draw (endless shoe), A high, **ties lose**, `mult = floor((1 - 0.03) / P(win), 2 decimals)` → 97% per guess, impossible side disabled, cash out any time, idle 120 s = auto cash out, auto cash out at ×1000. Blackjack table: 1–4 players, 2-deck shoe for groups, invite Accept/Decline (60 s; host's "Start now"; nobody → refund), bets taken on accept, turn order = invite order, 45 s per turn then auto-stand, natural pays 2.5× immediately (same as before), dealer hits to 17.
+3. ~~**Store/inventory buttons:**~~ *(V3 done)* `.estore` shows items with a **Buy button under each item**. **Delete `useitem` command**; `.inv` shows items with quantity and a **Use button** under each owned item. Update help, tests, translations.
+4. ~~**`.work` creative per language:**~~ *(V3 done: `WORK_LINES` en/tr/ru, 18 own lines each)* random funny jobs, different joke sets per language (TR memes for Turkish servers, EN memes for English, RU for Russian — e.g. "held the master's water bottle at the construction site" style). Not just translations — culturally different lines.
 5. **Tickets → select menu + modal:** replace panel buttons with a **Select menu**; choosing an option opens a **modal (title + description)**; admins can fully customise options (label, description, **any emoji incl. custom**), allow **attachments** (after opening, user can upload files in the ticket channel; or modal file upload if supported by the library version — check). Keep `/ticket add` / `/ticket remove` (done) for adding higher mods.
-6. **`forceban <user_id> [reason]`** — ban by ID even if the user isn't in the server (`guild.ban(discord.Object(id))`), Ban Members, case log, optional `-dm` not possible if not shared (skip).
+6. ~~**`forceban <user_id> [reason]`**~~ *(V3 done: `.forceban <id|@> [1d] [reason]`, alias `hackban`; refuses members above you/the bot, already-banned users; never DMs)* — ban by ID even if the user isn't in the server (`guild.ban(discord.Object(id))`), Ban Members, case log, optional `-dm` not possible if not shared (skip).
 7. **Language audit:** find any user-facing text not going through `L()` / untranslated, and any mixed-language responses; fix all.
 8. **Docs:** update `COMMANDS.md`, README, SETUP, GUIDE (stale: still mention music, Spotify, botperm, old invites), privacy policy additions (§6), the "Versa — bütün əmrlər" doc.
 9. Choose avatar (cube variants in `avatars/final/`, recommended `cube_indigo.png`) and upload.
@@ -131,13 +139,15 @@ cd ~/mybot && python3 bot.py --check        # prints prefix/slash counts, no Dis
 
 ---
 
+- **V3 (31 Oct, Claude Code):** project imported to GitHub; store/inventory with Buy/Use buttons under every item (`useitem` deleted); `.hl` Higher-Lower; multiplayer `.bj`; `.forceban`; `.work` per-language jokes; FX engine + own drawn cards in bot.py; animated `.slots` / `.cf`; text fallback when Pillow/Attach Files is missing; `test_v3.py`; dev-tools default to `../bot.py`.
+
 ## 9. Testing workflow (mandatory)
 
 ```bash
 python3 dev-tools/check.py bot.py          # syntax, undefined names, duplicates, slash limits, untranslated L()
-for t in selftest selftest2 test_db test_dd test_bans test_dm_commands test_topgg test_vcxp test_v2; do python3 dev-tools/$t.py || echo FAIL $t; done
+for t in selftest selftest2 test_db test_dd test_bans test_dm_commands test_topgg test_vcxp test_v2 test_v3; do python3 dev-tools/$t.py || echo FAIL $t; done
 ```
-- Tests load functions from `bot.py` via AST (`seg("name", …)`) with fake Discord objects; `BOT_SRC=path` env picks the file. When behaviour changes intentionally, update the test in the same change.
+- Tests load functions from `bot.py` via AST (`seg("name", …)`) with fake Discord objects; they default to `bot.py` next to `dev-tools/`, `BOT_SRC=path` env picks another file. `test_v3` also builds the real views with discord.py and renders the pictures with Pillow (skips those parts if missing). When behaviour changes intentionally, update the test in the same change.
 - Patch with AST helpers (`dev-tools/astpatch.py`: `func_text`, `replace_top`, `patch_in_func`, `delete_command`, `delete_top`) or exact-string replacements that assert match count == 1. Insert new blocks above the `# EVENTS` banner.
 - Work on a copy, run everything, copy to the delivery path only when all green.
 
@@ -153,5 +163,5 @@ for t in selftest selftest2 test_db test_dd test_bans test_dm_commands test_topg
 
 ## 11. Files
 
-`bot.py`, `CLAUDE.md`, `handoff.md` + `memory.md` (older notes, Azerbaijani ledger), `TOPGG_CHECKLIST.md`, `versa.service`, `privacy_policy.md`, `terms_of_service.md/.txt`, `server_rules.txt`, `site/`, `dev-tools/` (check, tests, astpatch, make_site), `fx/` (visual prototypes + preview GIFs/PNGs), `avatars/`.
+`bot.py`, `CLAUDE.md`, `handoff.md` + `memory.md` (older notes, Azerbaijani ledger - git-ignored, not in the repo), `TOPGG_CHECKLIST.md`, `versa.service`, `privacy_policy.md`, `terms_of_service.md/.txt`, `server_rules.txt`, `site/`, `dev-tools/` (check, tests, astpatch, make_site), `fx/` (visual prototypes + preview GIFs/PNGs), `avatars/`.
 Stale docs: `README.md`, `README.txt`, `SETUP.md`, `COMMANDS.md`, `VERSA_BOT_COMPLETE_GUIDE.md`.

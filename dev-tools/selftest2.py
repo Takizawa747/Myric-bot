@@ -1,6 +1,6 @@
 import ast, asyncio, collections, random, re, sys, types, unicodedata
 from datetime import datetime, timezone
-SRC = open(__import__("os").environ.get("BOT_SRC", "/mnt/user-data/outputs/bot.py"), encoding="utf-8").read(); TREE = ast.parse(SRC)
+SRC = open(__import__("os").environ.get("BOT_SRC", __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py")), encoding="utf-8").read(); TREE = ast.parse(SRC)
 def seg(*names):
     out = []
     for n in TREE.body:

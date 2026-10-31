@@ -1,5 +1,5 @@
 import ast, asyncio, contextvars, re, string, sys, types, collections
-SRC = open(__import__("os").environ.get("BOT_SRC", "/mnt/user-data/outputs/bot.py"), encoding="utf-8").read()
+SRC = open(__import__("os").environ.get("BOT_SRC", __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py")), encoding="utf-8").read()
 TREE = ast.parse(SRC)
 def seg(*names):
     out = []

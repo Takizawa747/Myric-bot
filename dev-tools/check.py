@@ -1,5 +1,5 @@
 import ast, sys, re, builtins, symtable, string, collections
-PATH = sys.argv[1] if len(sys.argv) > 1 else "/mnt/user-data/outputs/bot.py"
+PATH = sys.argv[1] if len(sys.argv) > 1 else __import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "..", "bot.py")
 LIMIT = int(sys.argv[2]) if len(sys.argv) > 2 else 60
 src = open(PATH, encoding="utf-8").read()
 errs, warns = [], []

@@ -1,0 +1,23 @@
+# Versa - runs the bot 24/7: starts on boot, restarts after a crash (top.gg declines bots that are offline during review).
+# Install (on the VPS):
+#   pkill -f "python3 bot.py"; screen -wipe          # stop the old screen instance first, or you get two bots
+#   sudo cp versa.service /etc/systemd/system/versa.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now versa
+#   journalctl -u versa -f                            # live log     |  sudo systemctl restart versa  # restart
+# Check first:  which python3   and that token.txt is in the WorkingDirectory.
+[Unit]
+Description=Versa Discord bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/mybot
+ExecStart=/usr/bin/python3 /home/ubuntu/mybot/bot.py
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

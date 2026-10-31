@@ -1,0 +1,16 @@
+# secrets / runtime data - never commit
+token.txt
+*.key
+*.pem
+.env
+versa.db
+versa.db-*
+*.db-wal
+*.db-shm
+backups/
+# private notes (name the VPS)
+handoff.md
+memory.md
+# python
+__pycache__/
+*.pyc

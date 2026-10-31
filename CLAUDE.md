@@ -160,6 +160,7 @@ for t in selftest selftest2 test_db test_dd test_bans test_dm_commands test_topg
 - Emojis in SelectOption must be real emojis (Discord 400 `Invalid emoji`).
 - Discord limits: 25 options/select, 25 fields/embed, 5 buttons/row, 5 rows, 100 chars option label, 25 subcommands/group, 2000 chars message, 4096 embed description.
 - Forgot to send files as cards once — always deliver the finished file.
+- **After every finished task send an updated `handoff.md` as a file** (Brad's rule, 31 Oct). It is git-ignored (names the VPS), so send it, don't commit it.
 
 ## 11. Files
 

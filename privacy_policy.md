@@ -106,7 +106,7 @@ We may update this policy. Significant changes will be announced on the support 
 ## 12. Contact Us
 
 - **Support Server:** https://discord.gg/hxYWsFVWp8
-- **GitHub:** github.com/Takizawa747/versa-bot
+- **GitHub:** github.com/Takizawa747/Myric-bot
 
 ---
 

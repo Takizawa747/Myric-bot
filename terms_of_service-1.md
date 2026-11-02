@@ -4,11 +4,11 @@
 
 ## 1. Acceptance of Terms
 
-By adding **Versa** ("the Bot") to your Discord server or using its features, you agree to these Terms of Service and to our [Privacy Policy](./privacy_policy.md). If you do not agree, remove the Bot from your server and stop using it.
+By adding **Myric** ("the Bot") to your Discord server or using its features, you agree to these Terms of Service and to our [Privacy Policy](./privacy_policy.md). If you do not agree, remove the Bot from your server and stop using it.
 
 ## 2. Description of Service
 
-Versa is a multi-purpose Discord bot with moderation tools, leveling, a virtual economy with a store and casino games, tickets, giveaways, polls, reaction roles, a counting channel, a honeypot channel, role persist, and server settings in English, Turkish and Russian.
+Myric is a multi-purpose Discord bot with moderation tools, leveling, a virtual economy with a store and casino games, tickets, giveaways, polls, reaction roles, a counting channel, a honeypot channel, role persist, and server settings in English, Turkish and Russian.
 
 ## 3. User Responsibilities
 
@@ -73,4 +73,4 @@ Questions or appeals: join our support server — **https://discord.gg/hxYWsFVWp
 
 ---
 
-*These Terms of Service apply to the Versa Discord Bot.*
+*These Terms of Service apply to the Myric Discord Bot.*

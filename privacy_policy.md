@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-This Privacy Policy explains what **Versa** ("the Bot", "we", "us") stores, why, and what you can do about it when you use the Bot on Discord. By using the Bot you agree to the practices described here. This policy applies to the Bot only, not to any Discord server that uses it.
+This Privacy Policy explains what **Myric** ("the Bot", "we", "us") stores, why, and what you can do about it when you use the Bot on Discord. By using the Bot you agree to the practices described here. This policy applies to the Bot only, not to any Discord server that uses it.
 
 ## 2. Information We Collect
 
@@ -56,7 +56,7 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 - Data is stored in a SQLite database on a private virtual server hosted by **Oracle Cloud in Frankfurt, Germany (EU)**.
 - A backup of the database is sent once a day as a zip file to the Bot owner's private Discord DMs. **Backups older than 7 days are deleted automatically.**
 - Access: the Bot owner. A few trusted staff members may use limited owner commands (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — or adjusting a balance or level). They cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.**
-- **Test copy:** the developers run a private test copy of the Bot on a private test server before changes reach Versa. It keeps its own, separate test data on the owner's device and is only used by the developers.
+- **Test copy:** the developers run a private test copy of the Bot on a private test server before changes reach Myric. It keeps its own, separate test data on the owner's device and is only used by the developers.
 - The server is protected with key-based SSH access, and the Bot's login token is kept outside the public code.
 
 ## 5. Data Retention
@@ -110,4 +110,4 @@ We may update this policy. Significant changes will be announced on the support 
 
 ---
 
-*This Privacy Policy applies to the Versa Discord Bot.*
+*This Privacy Policy applies to the Myric Discord Bot.*

@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** October 31, 2026
+**Last Updated:** November 6, 2026
 
 ## 1. Introduction
 
@@ -15,7 +15,7 @@ This Privacy Policy explains what **Myric** ("the Bot", "we", "us") stores, why,
 We do **not** collect e-mail addresses, IP addresses, passwords, payment details or voice audio.
 
 ### 2.2 Data stored when you use Bot features
-- **Economy** — virtual wallet and bank balance, the store items in your inventory, and the times you last used the daily, work and rob commands. The coins are virtual: they have no real-world value and cannot be bought, sold or cashed out
+- **Economy** — virtual wallet and bank balance, the store items in your inventory, and the times you last used the daily, work and rob commands, and how many mini-game wins paid coins today (a daily limit). The coins are virtual: they have no real-world value and cannot be bought, sold or cashed out
 - **XP and level** — experience earned from messages (only on servers where leveling is enabled) and, on servers that turned on *Voice XP*, from time spent talking in voice channels; for this the Bot keeps how many voice XP you earned today (reset every day, at most 4 hours a day count)
 - **Message counts** — on servers where leveling is enabled, the number of messages you sent per day for the last 30 days and a running total, shown in `/rank`. Only the numbers are kept, never what you wrote
 - **Flag game score** — number of correct answers
@@ -34,7 +34,7 @@ AFK status and message, command cooldowns, rate-limit counters and running games
 
 ### 2.4 Messages
 The Bot reads messages in servers only to detect commands, award XP, count messages and run the counting and honeypot channels. **Ordinary message content is not stored by the Bot.** The exceptions are:
-- **Log channels** — if a server enables logging, the Bot posts edited and deleted message content (taken from Discord's short-lived cache) into that server's own staff log channel. It stays inside Discord under the server's control; the Bot does not keep a copy.
+- **Log channels** — if a server enables logging, the Bot posts edited and deleted message content and files (taken from Discord's short-lived cache), and who deleted them when Discord's audit log shows it, into that server's own staff log channel. It stays inside Discord under the server's control; the Bot does not keep a copy.
 - **Direct messages and /modmail** — messages you send to the Bot in DMs or with `/modmail` are forwarded to the Bot owner so you can be answered. The Bot does not save them in its database.
 - **Tickets** — ticket conversations stay inside Discord. The Bot does not create or keep transcripts.
 

@@ -1,14 +1,14 @@
 # Terms of Service
 
-**Last Updated:** October 31, 2026
+**Last Updated:** November 9, 2026
 
 ## 1. Acceptance of Terms
 
-By adding **Myric** ("the Bot") to your Discord server or using its features, you agree to these Terms of Service and to our [Privacy Policy](./privacy_policy.md). If you do not agree, remove the Bot from your server and stop using it.
+By adding **Myric** ("the Bot") to your Discord server, using its features or using its web dashboard, you agree to these Terms of Service and to our [Privacy Policy](./privacy_policy.md). If you do not agree, remove the Bot from your server and stop using it.
 
 ## 2. Description of Service
 
-Myric is a multi-purpose Discord bot with moderation tools, leveling, a virtual economy with a store and casino games, tickets, giveaways, polls, reaction roles, a counting channel, a honeypot channel, role persist, and server settings in English, Turkish and Russian.
+Myric is a multi-purpose Discord bot with moderation tools, leveling, a virtual economy with a store and casino games, tickets, giveaways, polls, reaction roles, a counting channel, a honeypot channel, role persist, and server settings in English, Turkish and Russian. Server admins can change all settings on the Bot's web dashboard after logging in with Discord.
 
 ## 3. User Responsibilities
 
@@ -30,7 +30,7 @@ Myric is a multi-purpose Discord bot with moderation tools, leveling, a virtual 
 You may not use the Bot to:
 - distribute harmful, illegal or NSFW content
 - harass, threaten or abuse other users
-- try to crash, overload or exploit the Bot or its commands
+- try to crash, overload or exploit the Bot, its commands or its dashboard (including automated requests, scanning or trying to change servers you do not manage)
 - automate interactions in ways that break Discord's terms
 - avoid a ban, a Bot ban or any moderation action
 - trade the Bot's virtual currency or items for real money or anything of value
@@ -49,7 +49,7 @@ We may ban any user or server from using the Bot, at any time and without notice
 
 ## 9. Data
 
-What the Bot stores and how you can ask for it to be deleted is described in the [Privacy Policy](./privacy_policy.md).
+What the Bot and its dashboard store and how you can ask for it to be deleted is described in the [Privacy Policy](./privacy_policy.md). Changes you make on the dashboard are made in your name and are written to that server's log channel.
 
 ## 10. Availability and Disclaimer of Warranties
 

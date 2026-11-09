@@ -1,10 +1,10 @@
 # Privacy Policy
 
-**Last Updated:** November 6, 2026
+**Last Updated:** November 9, 2026
 
 ## 1. Introduction
 
-This Privacy Policy explains what **Myric** ("the Bot", "we", "us") stores, why, and what you can do about it when you use the Bot on Discord. By using the Bot you agree to the practices described here. This policy applies to the Bot only, not to any Discord server that uses it.
+This Privacy Policy explains what **Myric** ("the Bot", "we", "us") stores, why, and what you can do about it when you use the Bot on Discord and its web dashboard (the website where server admins change the Bot's settings). By using the Bot you agree to the practices described here. This policy applies to the Bot only, not to any Discord server that uses it.
 
 ## 2. Information We Collect
 
@@ -12,7 +12,7 @@ This Privacy Policy explains what **Myric** ("the Bot", "we", "us") stores, why,
 - **Discord User IDs** — to attach economy, level, game and moderation data to the right person
 - **Server (Guild), Channel, Role, Message and Emoji IDs** — for server settings, giveaways, reaction roles, tickets and logs
 
-We do **not** collect e-mail addresses, IP addresses, passwords, payment details or voice audio.
+We do **not** collect e-mail addresses, passwords, payment details or voice audio, and we do not store IP addresses (see 2.6).
 
 ### 2.2 Data stored when you use Bot features
 - **Economy** — virtual wallet and bank balance, the store items in your inventory, and the times you last used the daily, work and rob commands, and how many mini-game wins paid coins today (a daily limit). The coins are virtual: they have no real-world value and cannot be bought, sold or cashed out
@@ -30,7 +30,7 @@ We do **not** collect e-mail addresses, IP addresses, passwords, payment details
 - **Tickets** — the ticket owner's ID is written into the ticket channel's topic inside the server. The title, description and files you enter in the ticket form are posted into that ticket channel, inside Discord; the Bot does not keep a copy
 
 ### 2.3 Temporary data (memory only, erased on restart)
-AFK status and message, command cooldowns, rate-limit counters and running games.
+AFK status and message, command cooldowns, rate-limit counters, running games and dashboard login sessions (see 2.6).
 
 ### 2.4 Messages
 The Bot reads messages in servers only to detect commands, award XP, count messages and run the counting and honeypot channels. **Ordinary message content is not stored by the Bot.** The exceptions are:
@@ -42,9 +42,22 @@ The Bot reads messages in servers only to detect commands, award XP, count messa
 - **Voice:** the Bot never joins voice channels and never hears or records audio. For Voice XP it only reads the voice state Discord shares with bots (which voice channel you are in and whether you are muted or deafened), and only on servers that turned Voice XP on.
 - **Pictures:** rank, level-up and leaderboard cards are drawn from your current display name and avatar when they are shown. The pictures and avatars are not stored.
 
+### 2.6 Web dashboard (login with Discord)
+Server admins can change the Bot's settings on the dashboard (for example `dash.myricbot.com`). You log in with Discord ("Login with Discord", OAuth2). The dashboard asks Discord only for two things:
+- **identify** — your user ID, username, display name, avatar and language setting
+- **guilds** — the list of servers you are in, with your permissions there. It is used **only** to show you the servers where you have the *Manage Server* permission. It is not stored in the database, and nobody else (not the owner, not staff) can see it.
+
+What happens with it:
+- The access key Discord gives the dashboard is used once during the login and then thrown away. We never get your password or e-mail.
+- Your login is kept as a **session in the Bot's memory only** (user ID, name, avatar, the list of servers you can manage and a security token). It ends when you log out, after 7 days, or when the Bot restarts. It is never written to the database or into backups.
+- **One cookie:** `myric_sid`, a random session number. It is HttpOnly (scripts cannot read it), Secure (only over HTTPS) and SameSite=Lax, and lasts at most 7 days. There are no advertising or tracking cookies, and no analytics.
+- Every change is checked against your **real, current permissions** in that server (Manage Server; Manage Roles for reaction roles), with the same rules as the Bot's commands. Each change is posted in that server's own log channel (who changed which part), if the server uses logs.
+- The dashboard server sees your IP address while you use it, like every website. It is used only in memory to limit too many requests and is not logged or stored.
+- You can remove the dashboard's access any time in Discord: *User Settings -> Authorized Apps*.
+
 ## 3. How We Use Your Information
 
-Only to provide Bot features: economy, leveling, games, moderation, tickets, giveaways, polls, reaction roles, counting, honeypot protection, role persist and server settings.
+Only to provide Bot features: economy, leveling, games, moderation, tickets, giveaways, polls, reaction roles, counting, honeypot protection, role persist and server settings (in Discord and on the dashboard).
 
 **We do not:**
 - sell, rent or share your data with third parties
@@ -55,9 +68,9 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 
 - Data is stored in a SQLite database on a private virtual server hosted by **Oracle Cloud in Frankfurt, Germany (EU)**.
 - A backup of the database is sent once a day as a zip file to the Bot owner's private Discord DMs. **Backups older than 7 days are deleted automatically.**
-- Access: the Bot owner. A few trusted staff members may use limited owner commands (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — or adjusting a balance or level). They cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.**
+- Access: the Bot owner. A few trusted staff members may use limited owner commands (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — or adjusting a balance or level). They cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.** (The dashboard shows a logged-in person their own servers only, see 2.6.)
 - **Test copy:** the developers run a private test copy of the Bot on a private test server before changes reach Myric. It keeps its own, separate test data on the owner's device and is only used by the developers.
-- The server is protected with key-based SSH access, and the Bot's login token is kept outside the public code.
+- The server is protected with key-based SSH access, and the Bot's login token and the dashboard's client secret are kept outside the public code.
 
 ## 5. Data Retention
 
@@ -67,14 +80,14 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 - Voice XP day counter: reset every day.
 - Saved roles (Role Persist): removed after 60 days.
 - Backups: removed after 7 days.
+- Dashboard sessions: end on logout, after 7 days or when the Bot restarts (memory only).
 - **Moderation records** (warnings, bans, mutes, timeouts, kicks, case history, Bot bans): kept for the safety of servers. Deleting them on request would let anyone erase their own record, so they are not removed on request. If you think a record is wrong, contact the server's staff or us.
-- If the Bot is removed from a server its data is not deleted automatically (it is kept in case the Bot is added again). Server administrators can reset the Bot's configuration with `/setup reset`, and can ask us to remove other server data.
+- If the Bot is removed from a server its data is not deleted automatically (it is kept in case the Bot is added again). Server administrators can reset the Bot's configuration on the dashboard (*Reset*) or with `/setup reset`, and can ask us to remove other server data.
 
 ## 6. Your Rights
 
 - **Access** — ask us what the Bot stores about you.
-- **Deletion — do it yourself:** send `deletedata` to the Bot in a direct message and choose what to delete: economy (wallet, bank, inventory, cooldown times), XP and level, message counts, flag game score, saved roles, giveaway entries, poll votes, AFK status, a running game and temporary rate-limit data. It is removed from the live database at once.
-- **Deletion — or ask us:** we will delete the same data within 30 days. We cannot delete moderation records (see section 5).
+- **Deletion** — ask us on the support server or write to the Bot in a direct message (it reaches the Myric team). We delete the data the Bot stores about you — economy (wallet, bank, inventory, cooldown times), XP and level, message counts, flag game score, saved roles, giveaway entries, poll votes, AFK status, a running game and temporary rate-limit data — within 30 days. Only the Bot owner can delete data, so nobody can delete someone else's data. We cannot delete moderation records (see section 5).
 - **Correction** — ask us to correct data that is wrong.
 
 If you are in the EU or UK you also have the rights granted by the GDPR. Our legal basis is our legitimate interest in running and securing the Bot, and the legitimate interest of server communities in keeping moderation records.
@@ -89,15 +102,17 @@ You must be old enough to use Discord (at least 13, or higher where your country
 
 - **Discord API** — subject to [Discord's Privacy Policy](https://discord.com/privacy)
 - **flagcdn.com** — the flag game shows flag pictures hosted there (Discord loads the picture); no user data is sent
-- **Oracle Cloud** — hosts the server the Bot runs on
+- **Oracle Cloud** — hosts the server the Bot and the dashboard run on
+- **Caddy** with a free **Let's Encrypt** certificate — makes the dashboard connection encrypted (HTTPS); no user data is shared
+- **GitHub Pages** — hosts the static website `myricbot.com` (no cookies, no trackers, no analytics)
 
 ## 9. Security
 
-We take reasonable measures to protect stored data. No system is completely secure, so we cannot guarantee absolute security.
+We take reasonable measures to protect stored data: encrypted HTTPS for the dashboard, a random `state` check in the Discord login, a security token on every change (CSRF protection), strict content rules for the dashboard pages, and permission checks on every request. No system is completely secure, so we cannot guarantee absolute security.
 
 ## 10. Server Administrators
 
-Administrators who add the Bot to a server are responsible for informing their members about the data the Bot handles, for example by linking this policy.
+Administrators who add the Bot to a server are responsible for informing their members about the data the Bot handles, for example by linking this policy. Only members with the *Manage Server* permission in a server can change its settings on the dashboard; the Bot owner has no special access there.
 
 ## 11. Changes to This Policy
 

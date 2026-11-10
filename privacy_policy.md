@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** November 9, 2026
+**Last Updated:** November 10, 2026
 
 ## 1. Introduction
 
@@ -26,7 +26,8 @@ We do **not** collect e-mail addresses, passwords, payment details or voice audi
 - **Moderation records** — warnings, bans, kicks, mutes, timeouts and softbans, each with the reason, the moderator's ID, the time, and the Discord username of the member and of the moderator *at that time*. If a message is sent in a server's *honeypot* channel, the first 150 characters of that message are saved in the reason
 - **Scheduled actions** — timers for temporary bans, timed mutes and giveaways (user ID, server ID, due time) until they run
 - **Server configuration** — chosen channels, roles, prefix, language, feature switches, store items, reaction roles and the counting channel's current number
-- **Bot restrictions** — users and servers that are banned from the Bot, and the Bot's list of trusted staff (ID and username)
+- **Bot restrictions** — users and servers that are banned from the Bot or limited in some features, with the reason, who set it, when, and when it ends (temporary bans end by themselves), and the Bot's list of trusted staff (ID, username and their permissions)
+- **Deletion requests** — when you ask us to delete your data: your user ID and the date of the request, so it is handled within 30 days (see section 6)
 - **Tickets** — the ticket owner's ID is written into the ticket channel's topic inside the server. The title, description and files you enter in the ticket form are posted into that ticket channel, inside Discord; the Bot does not keep a copy
 
 ### 2.3 Temporary data (memory only, erased on restart)
@@ -35,7 +36,7 @@ AFK status and message, command cooldowns, rate-limit counters, running games an
 ### 2.4 Messages
 The Bot reads messages in servers only to detect commands, award XP, count messages and run the counting and honeypot channels. **Ordinary message content is not stored by the Bot.** The exceptions are:
 - **Log channels** — if a server enables logging, the Bot posts edited and deleted message content and files (taken from Discord's short-lived cache), and who deleted them when Discord's audit log shows it, into that server's own staff log channel. It stays inside Discord under the server's control; the Bot does not keep a copy.
-- **Direct messages and /modmail** — messages you send to the Bot in DMs or with `/modmail` are forwarded to the Bot owner so you can be answered. The Bot does not save them in its database.
+- **Direct messages and /modmail** — messages you send to the Bot in DMs or with `/modmail` reach the Myric team so you can be answered. They are stored for **30 days** in the Bot's database (your user ID, the text, the names and links of attached files, where you wrote from — "DM" or the server, private servers without their name — and the team's answers), so the team can read and answer them on the admin panel. After 30 days they are deleted automatically; you can ask for earlier deletion (section 6). Answers come by DM, signed "Myric team", and follow your `/dms off` setting.
 - **Tickets** — ticket conversations stay inside Discord. The Bot does not create or keep transcripts.
 
 ### 2.5 Voice and pictures
@@ -55,6 +56,12 @@ What happens with it:
 - The dashboard server sees your IP address while you use it, like every website. It is used only in memory to limit too many requests and is not logged or stored.
 - You can remove the dashboard's access any time in Discord: *User Settings -> Authorized Apps*.
 
+### 2.7 Anonymous usage counts
+To see which features are used and keep the Bot healthy, the Bot counts per day **how often each command was used (only the command's name)**, how many commands failed, how many servers and members it has in total, and how many servers added or removed it. It also counts how many servers switched each feature on and which language they use. These numbers contain **no user IDs and no server IDs**, cannot be linked to a person, and are kept for 90 days.
+
+### 2.8 Admin audit log
+When the Bot owner or a trusted staff member uses an owner tool (for example a Bot ban, a balance change or an answer to a modmail), the action is recorded: who did it (ID and name), what was done, the target (for example a user ID or a server) and when. This keeps the team accountable. The log is kept for **180 days** and, like moderation records, is not removed on a deletion request.
+
 ## 3. How We Use Your Information
 
 Only to provide Bot features: economy, leveling, games, moderation, tickets, giveaways, polls, reaction roles, counting, honeypot protection, role persist and server settings (in Discord and on the dashboard).
@@ -68,7 +75,7 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 
 - Data is stored in a SQLite database on a private virtual server hosted by **Oracle Cloud in Frankfurt, Germany (EU)**.
 - A backup of the database is sent once a day as a zip file to the Bot owner's private Discord DMs. **Backups older than 7 days are deleted automatically.**
-- Access: the Bot owner. A few trusted staff members may use limited owner commands (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — or adjusting a balance or level). They cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.** (The dashboard shows a logged-in person their own servers only, see 2.6.)
+- Access: the Bot owner. A few trusted staff members may use limited owner tools, each only with the permission the owner gave them (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — adjusting a balance or level, or reading and answering modmail). Staff never act on themselves or on other staff, every staff action is in the audit log (2.8), and they cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.** (The dashboard shows a logged-in person their own servers only, see 2.6.)
 - **Test copy:** the developers run a private test copy of the Bot on a private test server before changes reach Myric. It keeps its own, separate test data on the owner's device and is only used by the developers.
 - The server is protected with key-based SSH access, and the Bot's login token and the dashboard's client secret are kept outside the public code.
 
@@ -80,6 +87,11 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 - Voice XP day counter: reset every day.
 - Saved roles (Role Persist): removed after 60 days.
 - Backups: removed after 7 days.
+- Modmail messages (DMs and `/modmail`): removed after 30 days.
+- Anonymous usage counts: removed after 90 days.
+- Admin audit log: removed after 180 days.
+- Bot bans and restrictions: a temporary one ends at its end time and its reason is removed with it; a permanent one is kept like a moderation record.
+- Deletion requests: removed 90 days after they were handled.
 - Dashboard sessions: end on logout, after 7 days or when the Bot restarts (memory only).
 - **Moderation records** (warnings, bans, mutes, timeouts, kicks, case history, Bot bans): kept for the safety of servers. Deleting them on request would let anyone erase their own record, so they are not removed on request. If you think a record is wrong, contact the server's staff or us.
 - If the Bot is removed from a server its data is not deleted automatically (it is kept in case the Bot is added again). Server administrators can reset the Bot's configuration on the dashboard (*Reset*) or with `/setup reset`, and can ask us to remove other server data.
@@ -87,7 +99,7 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 ## 6. Your Rights
 
 - **Access** — ask us what the Bot stores about you.
-- **Deletion** — ask us on the support server or write to the Bot in a direct message (it reaches the Myric team). We delete the data the Bot stores about you — economy (wallet, bank, inventory, cooldown times), XP and level, message counts, flag game score, saved roles, giveaway entries, poll votes, AFK status, a running game and temporary rate-limit data — within 30 days. Only the Bot owner can delete data, so nobody can delete someone else's data. We cannot delete moderation records (see section 5).
+- **Deletion** — ask us on the support server or write to the Bot in a direct message (it reaches the Myric team). We delete the data the Bot stores about you — economy (wallet, bank, inventory, cooldown times), XP and level, message counts, flag game score, saved roles, giveaway entries, poll votes, AFK status, a running game, stored modmail messages and temporary rate-limit data — within 30 days. Only the Bot owner can delete data, so nobody can delete someone else's data. We cannot delete moderation records (see section 5).
 - **Correction** — ask us to correct data that is wrong.
 
 If you are in the EU or UK you also have the rights granted by the GDPR. Our legal basis is our legitimate interest in running and securing the Bot, and the legitimate interest of server communities in keeping moderation records.

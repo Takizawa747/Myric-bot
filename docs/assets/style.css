@@ -33,6 +33,7 @@ html.js .rv.in{opacity:1;transform:none;transition:opacity .8s var(--ease) calc(
 .links a{position:relative;color:var(--muted);font-weight:500;font-size:.95rem;padding:6px 0}
 .links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--brand),var(--teal));transform:scaleX(0);transition:transform .25s var(--ease)}
 .links a:hover,.links a.on{color:var(--text)}.links a:hover::after,.links a.on::after{transform:scaleX(1)}
+@media (max-width:1080px){.links{gap:16px}.links a{font-size:.88rem}}
 .langs{display:flex;padding:3px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
 .langs a{padding:5px 9px;border-radius:8px;color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.04em}
 .langs a.on{background:rgba(118,99,246,.25);color:#fff}

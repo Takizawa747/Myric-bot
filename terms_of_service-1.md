@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated:** November 9, 2026
+**Last Updated:** November 14, 2026
 
 ## 1. Acceptance of Terms
 
@@ -53,7 +53,7 @@ What the Bot and its dashboard store and how you can ask for it to be deleted is
 
 ## 10. Availability and Disclaimer of Warranties
 
-The Bot runs on a single server and is provided "as is", without warranties of any kind. We do not guarantee uptime, accuracy or uninterrupted service, and features may change or be removed.
+Myric is built to be online **24/7**: it runs on a dedicated cloud server, restarts itself automatically after a problem, and its data is backed up every day. Like every online service, short interruptions can still happen (for example during updates, or when Discord or our hosting provider has an outage). For that reason the Bot is provided "as is", without warranties of any kind, and we cannot promise that it will never be interrupted. Features may change or be removed; we announce important changes on the support server.
 
 ## 11. Limitation of Liability
 

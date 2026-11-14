@@ -73,8 +73,8 @@ Only to provide Bot features: economy, leveling, games, moderation, tickets, giv
 
 ## 4. Where Data Is Stored and Who Can Access It
 
-- Data is stored in a SQLite database on a private virtual server hosted by **Oracle Cloud in Frankfurt, Germany (EU)**.
-- A backup of the database is sent once a day as a zip file to the Bot owner's private Discord DMs. **Backups older than 7 days are deleted automatically.**
+- Data is stored in a database on a dedicated, private cloud server in the **European Union (Germany)**. Only the Myric team can access it, over encrypted connections.
+- The database is backed up automatically once a day to a private, access-restricted location, so no data is lost if the server fails. **Backups older than 7 days are deleted automatically.**
 - Access: the Bot owner. A few trusted staff members may use limited owner tools, each only with the permission the owner gave them (for example looking up a Discord account's public details — name, ID, account age and Bot restrictions — adjusting a balance or level, or reading and answering modmail). Staff never act on themselves or on other staff, every staff action is in the audit log (2.8), and they cannot access the database file. **We do not look up or list which servers a person is in, and we do not build profiles of users.** (The dashboard shows a logged-in person their own servers only, see 2.6.)
 - **Test copy:** the developers run a private test copy of the Bot on a private test server before changes reach Myric. It keeps its own, separate test data on the owner's device and is only used by the developers.
 - The server is protected with key-based SSH access, and the Bot's login token and the dashboard's client secret are kept outside the public code.
@@ -114,7 +114,7 @@ You must be old enough to use Discord (at least 13, or higher where your country
 
 - **Discord API** — subject to [Discord's Privacy Policy](https://discord.com/privacy)
 - **flagcdn.com** — the flag game shows flag pictures hosted there (Discord loads the picture); no user data is sent
-- **Oracle Cloud** — hosts the server the Bot and the dashboard run on
+- **Our cloud hosting provider (EU)** — runs the server the Bot and the dashboard run on; it only stores the data for us and does not use it for anything else
 - **Caddy** with a free **Let's Encrypt** certificate — makes the dashboard connection encrypted (HTTPS); no user data is shared
 - **GitHub Pages** — hosts the static website `myricbot.com` (no cookies, no trackers, no analytics)
 

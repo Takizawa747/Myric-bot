@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated:** November 14, 2026
+**Last Updated:** November 15, 2026
 
 ## 1. Acceptance of Terms
 
@@ -50,6 +50,10 @@ We may ban any user or server from using the Bot, at any time and without notice
 ## 9. Data
 
 What the Bot and its dashboard store and how you can ask for it to be deleted is described in the [Privacy Policy](./privacy_policy.md). Changes you make on the dashboard are made in your name and are written to that server's log channel.
+
+**Team access.** A server owner (or a member with Manage Server) can give chosen roles or people access to chosen dashboard pages. The server decides whom it trusts this way; anti-nuke and the access settings can never be handed out.
+
+**Myric Support access.** Need help? The Myric support team can open your Myric settings to fix things for you. They only see and change Myric's own settings — never your messages, members, roles or channels. Every change is written to your log channel as "Myric Support". You can switch this off at any time on the dashboard (General page); it is on by default. While it is off, the support team can still view the settings (read only) to answer questions and check reports of misuse, but changes nothing. Anti-nuke is never changed by support. Details: [Privacy Policy](./privacy_policy.md), section 10.
 
 ## 10. Availability and Disclaimer of Warranties
 

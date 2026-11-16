@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** November 15, 2026
+**Last Updated:** November 16, 2026
 
 ## 1. Introduction
 
@@ -46,6 +46,7 @@ The Bot reads messages in servers only to detect commands, award XP, count messa
 - **Log channels** — if a server enables logging, the Bot posts edited and deleted message content and files (taken from Discord's short-lived cache), and who deleted them when Discord's audit log shows it, into that server's own staff log channel. It stays inside Discord under the server's control; the Bot does not keep a copy.
 - **Direct messages and /modmail** — messages you send to the Bot in DMs or with `/modmail` reach the Myric team so you can be answered. They are stored for **30 days** in the Bot's database (your user ID, the text, the names and links of attached files, where you wrote from — "DM" or the server, private servers without their name — and the team's answers), so the team can read and answer them on the admin panel. After 30 days they are deleted automatically; you can ask for earlier deletion (section 6). Answers come by DM, signed "Myric team", and follow your `/dms off` setting.
 - **Tickets** — ticket conversations stay inside Discord. The Bot does not create or keep transcripts.
+- **Ticket claims and reviews** — when a staff member presses **Claim**, the Bot remembers who handles that open ticket until it is closed. If the server switched **ticket reviews** on, the Bot asks the ticket owner by DM for 1–5 stars and an optional comment after the ticket is closed (never if you turned Myric DMs off with `/dms off`). Until you answer, the Bot keeps the ticket number and topic, your user ID and the IDs of the staff member who claimed and who closed the ticket, for at most 7 days. Your review (stars, comment, you and the staff member) is posted into the review channel the server chose, inside Discord; the Bot does not keep a copy.
 
 ### 2.5 Voice and pictures
 - **Voice:** the Bot never joins voice channels and never hears or records audio. For Voice XP it only reads the voice state Discord shares with bots (which voice channel you are in and whether you are muted or deafened), and only on servers that turned Voice XP on.

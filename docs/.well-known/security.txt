@@ -1,4 +1,4 @@
 Contact: https://discord.gg/hxYWsFVWp8
-Expires: 2027-11-16T04:48:14Z
+Expires: 2027-11-16T06:47:05Z
 Preferred-Languages: en, tr, ru
 Canonical: https://myricbot.com/.well-known/security.txt

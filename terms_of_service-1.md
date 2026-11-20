@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated:** November 15, 2026
+**Last Updated:** November 20, 2026
 
 ## 1. Acceptance of Terms
 
@@ -24,6 +24,8 @@ Myric is a multi-purpose Discord bot with moderation tools, leveling, a virtual 
 - Casino games (blackjack, higher or lower, slots, roulette, coinflip) are for entertainment only. You can never win money or anything of real-world value.
 - Do not buy, sell or trade coins, items or accounts for real money or anything of value, inside or outside Discord. This can lead to a Bot ban and to the economy data being reset.
 - Server administrators or the Bot's developers may reset or adjust economy data at any time, for example to remove cheating.
+- **Myric Gems, achievements, quests and profile items** are virtual too. Gems can only be earned by playing and being active; they cannot be bought, sold, traded, given to someone else or exchanged for coins, and they have no value outside Myric. Shop purchases are final. To fix bugs, balance the game or remove cheating or abuse, the Bot's developers may change, reset or remove gems, progress, ranks or items, change Shop prices and items, and pause gems and achievements for a while.
+- The Bot's developers may run time-limited casino boosts that raise the luck or winnings of a game for everyone; a running boost is shown in that game's results.
 
 ## 5. Prohibited Uses
 

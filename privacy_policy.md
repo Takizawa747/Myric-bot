@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** November 20, 2026
+**Last Updated:** November 23, 2026
 
 ## 1. Introduction
 
@@ -156,6 +156,8 @@ Who can open a server's Myric settings on the dashboard:
 ## 11. Changes to This Policy
 
 We may update this policy. Significant changes will be announced on the support server. The date at the top shows the latest version.
+
+When we add a new feature, how it handles data is published at https://dash.myricbot.com/privacy-updates the moment it goes live, and added to this policy at the next update.
 
 ## 12. Contact Us
 
